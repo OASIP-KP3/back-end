@@ -32,12 +32,12 @@ public class EventListAllDto {
 
     public String getEventStartDate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
-        ZoneId zone = ZoneId.of("GMT+07:00");
+        ZoneId zone = ZoneId.systemDefault();
         return LocalDate.ofInstant(eventStartTime, zone).format(formatter);
     }
 
     public String getEventStartTime() {
-        ZoneId zone = ZoneId.of("GMT+07:00");
+        ZoneId zone = ZoneId.systemDefault();
         return LocalTime.ofInstant(eventStartTime, zone).toString();
     }
 }
