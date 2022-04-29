@@ -30,14 +30,4 @@ public class EventDetailsBaseDto {
     public String getEventCategoryName() {
         return eventCategory.getCategoryName();
     }
-
-    public String getEventStartDate() {
-        LocalDate date = eventStartTime.atZone(ZoneId.systemDefault()).toLocalDate();
-        return date.toString();
-    }
-
-    public String getEventStartTime() {
-        LocalTime time = eventStartTime.atZone(ZoneId.systemDefault()).toLocalTime();
-        return time.toString();
-    }
 }
