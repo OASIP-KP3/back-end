@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.Date;
+import java.time.format.DateTimeFormatter;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,5 +28,16 @@ public class EventListAllDto {
 
     public String getEventCategoryName() {
         return eventCategory.getCategoryName();
+    }
+
+    public String getEventStartDate() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+        ZoneId zone = ZoneId.of("GMT+07:00");
+        return LocalDate.ofInstant(eventStartTime, zone).format(formatter);
+    }
+
+    public String getEventStartTime() {
+        ZoneId zone = ZoneId.of("GMT+07:00");
+        return LocalTime.ofInstant(eventStartTime, zone).toString();
     }
 }
