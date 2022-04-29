@@ -8,6 +8,7 @@ import sit.int221.oasipservice.services.EventBookingService;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/events")
 public class EventBookingController {
