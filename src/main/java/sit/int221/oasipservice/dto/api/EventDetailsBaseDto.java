@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 @Getter
 @Setter
 public class EventDetailsBaseDto {
-    @JsonIgnore
     private Integer id;
     private String bookingName;
     private String bookingEmail;
