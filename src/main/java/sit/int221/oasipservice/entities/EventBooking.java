@@ -9,10 +9,14 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "event_booking")
+@Table(name = "event_booking", indexes = {
+        @Index(name = "PRIMARY", columnList = "booking_id"),
+        @Index(name = "fk_booking_to_category_idx", columnList = "event_category")
+})
 public class EventBooking {
     @Id
     @Column(name = "booking_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "booking_name", nullable = false, length = 100)

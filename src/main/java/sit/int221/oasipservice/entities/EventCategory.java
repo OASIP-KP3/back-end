@@ -10,7 +10,12 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "event_category")
+@Table(name = "event_category", indexes = {
+        @Index(name = "PRIMARY", columnList = "category_id"),
+        @Index(name = "category_name_UNIQUE", columnList = "category_name")
+}, uniqueConstraints = {
+        @UniqueConstraint(name = "uc_category_name", columnNames = {"category_name"})
+})
 public class EventCategory {
     @Id
     @Column(name = "category_id", nullable = false)
