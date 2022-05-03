@@ -2,11 +2,12 @@ package sit.int221.oasipservice.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sit.int221.oasipservice.dto.api.CategoryDto;
+import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.services.EventCategoryService;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/categories")
 public class EventCategoryController {

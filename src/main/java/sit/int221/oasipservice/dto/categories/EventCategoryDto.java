@@ -1,9 +1,10 @@
-package sit.int221.oasipservice.dto;
+package sit.int221.oasipservice.dto.categories;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sit.int221.oasipservice.dto.events.EventBookingDto;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

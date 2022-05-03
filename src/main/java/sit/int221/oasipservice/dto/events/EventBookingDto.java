@@ -1,4 +1,4 @@
-package sit.int221.oasipservice.dto;
+package sit.int221.oasipservice.dto.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +15,7 @@ public class EventBookingDto {
     private Integer id;
     private String bookingName;
     private String bookingEmail;
-    private EventCategoryDto eventCategory;
+    private Integer categoryId;
     private Instant eventStartTime;
     private Integer eventDuration;
     private String eventNotes;

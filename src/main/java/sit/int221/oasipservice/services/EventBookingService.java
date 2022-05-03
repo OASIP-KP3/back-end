@@ -6,8 +6,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import sit.int221.oasipservice.dto.api.EventDetailsBaseDto;
-import sit.int221.oasipservice.dto.api.EventListAllDto;
+import sit.int221.oasipservice.dto.events.EventBookingDto;
+import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
+import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.repo.EventBookingRepository;
 import sit.int221.oasipservice.utils.ListMapper;
@@ -36,5 +37,18 @@ public class EventBookingService {
     public EventDetailsBaseDto getEventDetails(Integer id) {
         EventBooking booking = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return modelMapper.map(booking, EventDetailsBaseDto.class);
+    }
+
+    public void save(EventBookingDto newBooking) {
+        EventBooking booking = modelMapper.map(newBooking, EventBooking.class);
+        repo.saveAndFlush(booking);
+    }
+
+    public void delete(Integer id) {
+        if (repo.existsById(id)) {
+            repo.deleteById(id);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist");
+        }
     }
 }

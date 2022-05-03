@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import sit.int221.oasipservice.dto.api.CategoryDto;
+import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.entities.EventCategory;
 import sit.int221.oasipservice.repo.EventCategoryRepository;
 import sit.int221.oasipservice.utils.ListMapper;

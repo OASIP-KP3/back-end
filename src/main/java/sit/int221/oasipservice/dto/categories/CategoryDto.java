@@ -1,4 +1,4 @@
-package sit.int221.oasipservice.dto.api;
+package sit.int221.oasipservice.dto.categories;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
