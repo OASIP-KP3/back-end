@@ -7,7 +7,7 @@ import sit.int221.oasipservice.services.EventCategoryService;
 
 import java.util.List;
 
-@CrossOrigin(origins = {"http://ip21kp3.sit.kmutt.ac.th", "http://localhost:3000"})
+@CrossOrigin(origins = {"http://ip21kp3.sit.kmutt.ac.th", "http://localhost:3000", "http://intproj21.sit.kmutt.ac.th/kp3"})
 @RestController
 @RequestMapping("/api/categories")
 public class EventCategoryController {
