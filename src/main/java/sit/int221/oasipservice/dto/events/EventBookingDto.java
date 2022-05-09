@@ -24,7 +24,7 @@ public class EventBookingDto {
     private String eventNotes;
 
     public EventBookingDto setEventStartTime(Instant eventStartTime) {
-        this.eventStartTime = eventStartTime.plus(7, ChronoUnit.HOURS);
+        this.eventStartTime = Instant.from(eventStartTime.atZone(ZoneId.systemDefault()));
         return this;
     }
 }
