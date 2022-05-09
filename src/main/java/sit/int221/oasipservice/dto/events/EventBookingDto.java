@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 
 @AllArgsConstructor
@@ -20,12 +17,7 @@ public class EventBookingDto {
     private String bookingName;
     private String bookingEmail;
     private Integer categoryId;
-    private Instant eventStartTime;
+    private LocalDateTime eventStartTime;
     private Integer eventDuration;
     private String eventNotes;
-
-    public EventBookingDto setEventStartTime(Instant eventStartTime) {
-        this.eventStartTime = eventStartTime.plus(7, ChronoUnit.HOURS);
-        return this;
-    }
 }

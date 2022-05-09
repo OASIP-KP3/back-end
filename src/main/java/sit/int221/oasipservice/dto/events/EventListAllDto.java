@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sit.int221.oasipservice.dto.categories.EventCategoryDto;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 @AllArgsConstructor
@@ -22,7 +19,7 @@ public class EventListAllDto {
     private String bookingName;
     @JsonIgnore
     private EventCategoryDto eventCategory;
-    private Instant eventStartTime;
+    private LocalDateTime eventStartTime;
     private Integer eventDuration;
 
     public String getEventCategoryName() {
@@ -31,12 +28,10 @@ public class EventListAllDto {
 
     public String getEventStartDate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
-        ZoneId zone = ZoneId.systemDefault();
-        return LocalDate.ofInstant(eventStartTime, zone).format(formatter);
+        return eventStartTime.toLocalDate().format(formatter);
     }
 
     public String getEventStartTime() {
-        ZoneId zone = ZoneId.systemDefault();
-        return LocalTime.ofInstant(eventStartTime, zone).toString();
+        return eventStartTime.toLocalTime().toString();
     }
 }

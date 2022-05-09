@@ -13,11 +13,8 @@ import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.repo.EventBookingRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -56,34 +53,29 @@ public class EventBookingService {
     private boolean isOverlap(EventBookingDto newBooking) {
         EventBooking booking = modelMapper.map(newBooking, EventBooking.class);
 
-        ZoneId zone = ZoneId.systemDefault();
-        LocalDate date = LocalDate.ofInstant(booking.getEventStartTime(), zone);
+        LocalDate date = booking.getEventStartTime().toLocalDate();
         Integer categoryId = booking.getEventCategory().getId();
         List<EventBooking> bookings = repo.findAllByDateAndCategory(date.toString(), categoryId);
 
-        LocalTime startA = getStartTime(booking, zone);
-        LocalTime endA = getEndTime(booking, zone);
+        LocalTime startA = getStartTime(booking);
+        LocalTime endA = getEndTime(booking);
 
         for (EventBooking book : bookings) {
-            LocalTime startB = getStartTime(book, zone);
-            LocalTime endB = getEndTime(book, zone);
+            LocalTime startB = getStartTime(book);
+            LocalTime endB = getEndTime(book);
 
             if (startA.isBefore(endB) && endA.isAfter(startB)) return true;
         }
         return false;
     }
 
-    private Instant plusMinutes(Instant dateTime, long minutes) {
-        return dateTime.plus(minutes, ChronoUnit.MINUTES);
+    private LocalTime getStartTime(EventBooking booking) {
+        return booking.getEventStartTime().toLocalTime();
     }
 
-    private LocalTime getStartTime(EventBooking booking, ZoneId zone) {
-        return LocalTime.ofInstant(booking.getEventStartTime(), zone);
-    }
-
-    private LocalTime getEndTime(EventBooking booking, ZoneId zone) {
+    private LocalTime getEndTime(EventBooking booking) {
         long minutes = booking.getEventDuration().longValue();
-        return LocalTime.ofInstant(plusMinutes(booking.getEventStartTime(), minutes), zone);
+        return booking.getEventStartTime().toLocalTime().plusMinutes(minutes);
     }
 
     public void delete(Integer id) {
