@@ -20,12 +20,12 @@ public class EventBookingDto {
     private String bookingName;
     private String bookingEmail;
     private Integer categoryId;
-    private ZonedDateTime eventStartTime;
+    private Instant eventStartTime;
     private Integer eventDuration;
     private String eventNotes;
 
     public EventBookingDto setEventStartTime(Instant eventStartTime) {
-        this.eventStartTime = eventStartTime.atZone(ZoneId.systemDefault());
+        this.eventStartTime = eventStartTime.plus(7, ChronoUnit.HOURS);
         return this;
     }
 }
