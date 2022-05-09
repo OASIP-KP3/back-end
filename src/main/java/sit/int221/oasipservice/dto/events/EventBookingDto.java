@@ -8,6 +8,7 @@ import lombok.Setter;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 @AllArgsConstructor
@@ -19,12 +20,12 @@ public class EventBookingDto {
     private String bookingName;
     private String bookingEmail;
     private Integer categoryId;
-    private Instant eventStartTime;
+    private ZonedDateTime eventStartTime;
     private Integer eventDuration;
     private String eventNotes;
 
     public EventBookingDto setEventStartTime(Instant eventStartTime) {
-        this.eventStartTime = Instant.from(eventStartTime.atZone(ZoneId.systemDefault()));
+        this.eventStartTime = eventStartTime.atZone(ZoneId.systemDefault());
         return this;
     }
 }
