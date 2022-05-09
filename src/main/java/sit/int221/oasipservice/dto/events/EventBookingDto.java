@@ -8,6 +8,7 @@ import lombok.Setter;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,7 +24,7 @@ public class EventBookingDto {
     private String eventNotes;
 
     public EventBookingDto setEventStartTime(Instant eventStartTime) {
-        this.eventStartTime = eventStartTime.atOffset(ZoneOffset.ofHours(7)).toInstant();
+        this.eventStartTime = eventStartTime.plus(7, ChronoUnit.HOURS);
         return this;
     }
 }
