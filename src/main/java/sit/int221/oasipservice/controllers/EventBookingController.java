@@ -41,4 +41,9 @@ public class EventBookingController {
     public void deleteEvent(@PathVariable Integer id) {
         service.delete(id);
     }
+
+    @PutMapping("/{id}")
+    public void updateEvent(@PathVariable Integer id, @RequestBody EventBookingDto booking) {
+        service.update(id, booking);
+    }
 }
