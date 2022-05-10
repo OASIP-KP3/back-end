@@ -13,7 +13,6 @@ import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.repo.EventBookingRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -66,19 +65,20 @@ public class EventBookingService {
 
     private boolean isOverlap(EventBookingDto newBooking) {
         EventBooking booking = modelMapper.map(newBooking, EventBooking.class);
-
-        LocalDate date = booking.getEventStartTime().toLocalDate();
-        Integer categoryId = booking.getEventCategory().getId();
-        List<EventBooking> bookings = repo.findAllByDateAndCategory(date.toString(), categoryId);
-
         LocalTime startA = getStartTime(booking);
         LocalTime endA = getEndTime(booking);
+        String date = booking.getEventStartTime().toLocalDate().toString();
+        Integer categoryId = booking.getEventCategory().getId();
+        List<EventBooking> bookings = repo.findAllByDateAndCategory(date, categoryId, startA.getHour());
 
-        for (EventBooking book : bookings) {
-            LocalTime startB = getStartTime(book);
-            LocalTime endB = getEndTime(book);
-
-            if (startA.isBefore(endB) && endA.isAfter(startB)) return true;
+        if (bookings.isEmpty()) {
+            return false;
+        } else {
+            for (EventBooking book : bookings) {
+                LocalTime startB = getStartTime(book);
+                LocalTime endB = getEndTime(book);
+                if (startA.isBefore(endB) && endA.isAfter(startB)) return true;
+            }
         }
         return false;
     }
