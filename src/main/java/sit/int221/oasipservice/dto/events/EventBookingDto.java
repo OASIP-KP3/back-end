@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,4 +22,19 @@ public class EventBookingDto {
     private LocalDateTime eventStartTime;
     private Integer eventDuration;
     private String eventNotes;
+
+    public EventBookingDto setBookingEmail(String bookingEmail) {
+        this.bookingEmail = bookingEmail.trim();
+        return this;
+    }
+
+    public EventBookingDto setBookingName(String bookingName) {
+        this.bookingName = bookingName.trim();
+        return this;
+    }
+
+    public EventBookingDto setEventNotes(String eventNotes) {
+        this.eventNotes = eventNotes.equals("") ? null : eventNotes;
+        return this;
+    }
 }

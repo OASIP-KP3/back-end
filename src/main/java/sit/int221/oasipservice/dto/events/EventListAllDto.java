@@ -27,7 +27,7 @@ public class EventListAllDto {
     }
 
     public String getEventStartDate() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
         return eventStartTime.toLocalDate().format(formatter);
     }
 

@@ -15,6 +15,7 @@ import sit.int221.oasipservice.utils.ListMapper;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class EventBookingService {
@@ -44,9 +45,18 @@ public class EventBookingService {
         if (isOverlap(newBooking)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, newBooking.getEventStartTime() + " is overlap");
         } else {
-            EventBooking booking = modelMapper.map(newBooking, EventBooking.class);
-            repo.saveAndFlush(booking);
+            String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+            if (validateEmail(newBooking.getBookingEmail(), regexPattern)) {
+                EventBooking booking = modelMapper.map(newBooking, EventBooking.class);
+                repo.saveAndFlush(booking);
+            } else {
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newBooking.getBookingEmail() + " is a wrong format");
+            }
         }
+    }
+
+    private boolean validateEmail(String emailAddress, String regexPattern) {
+        return Pattern.compile(regexPattern).matcher(emailAddress).matches();
     }
 
     public void update(Integer id, EventBookingDto booking) {
