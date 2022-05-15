@@ -34,4 +34,8 @@ public class EventListAllDto {
     public String getEventStartTime() {
         return eventStartTime.toLocalTime().toString();
     }
+
+    public String getStartDateTime() {
+        return eventStartTime.toString();
+    }
 }
