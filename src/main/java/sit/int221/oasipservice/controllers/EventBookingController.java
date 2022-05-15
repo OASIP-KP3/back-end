@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.dto.events.EventBookingDto;
 import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
+import sit.int221.oasipservice.dto.events.fields.EventDateTimeDto;
+import sit.int221.oasipservice.dto.events.fields.EventNotesDto;
 import sit.int221.oasipservice.services.EventBookingService;
 
 import java.util.List;
@@ -42,8 +44,13 @@ public class EventBookingController {
         service.delete(id);
     }
 
-    @PutMapping("/{id}")
-    public void updateEvent(@PathVariable Integer id, @RequestBody EventBookingDto booking) {
-        service.update(id, booking);
+    @PatchMapping("/datetime/{id}")
+    public void updateDatetime(@PathVariable Integer id, @RequestBody EventDateTimeDto datetime) {
+        service.updateDatetime(id, datetime);
+    }
+
+    @PatchMapping("/notes/{id}")
+    public void updateNotes(@PathVariable Integer id, @RequestBody EventNotesDto notes) {
+        service.updateNotes(id, notes);
     }
 }

@@ -9,10 +9,13 @@ import org.springframework.web.server.ResponseStatusException;
 import sit.int221.oasipservice.dto.events.EventBookingDto;
 import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
+import sit.int221.oasipservice.dto.events.fields.EventDateTimeDto;
+import sit.int221.oasipservice.dto.events.fields.EventNotesDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.repo.EventBookingRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -37,76 +40,90 @@ public class EventBookingService {
     }
 
     public EventDetailsBaseDto getEventDetails(Integer id) {
-        EventBooking booking = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist"));
-        return modelMapper.map(booking, EventDetailsBaseDto.class);
-    }
-
-    public void save(EventBookingDto newBooking) {
-        if (isOverlap(newBooking)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, newBooking.getEventStartTime() + " is overlap");
+        if (!repo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist");
         } else {
-            String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-            if (validateEmail(newBooking.getBookingEmail(), regexPattern)) {
-                EventBooking booking = modelMapper.map(newBooking, EventBooking.class);
-                repo.saveAndFlush(booking);
-            } else {
-                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newBooking.getBookingEmail() + " is a wrong format");
-            }
+            EventBooking booking = repo.getById(id);
+            return modelMapper.map(booking, EventDetailsBaseDto.class);
         }
     }
 
-    private boolean validateEmail(String emailAddress, String regexPattern) {
+    public void save(EventBookingDto newBooking) {
+        if (isOverlap(newBooking.getId(), newBooking.getEventStartTime())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, newBooking.getEventStartTime() + " is overlap");
+        }
+        String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+        if (!isValidEmail(newBooking.getBookingEmail(), regexPattern)) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newBooking.getBookingEmail() + " is a wrong format");
+        } else {
+            EventBooking booking = modelMapper.map(newBooking, EventBooking.class);
+            repo.saveAndFlush(booking);
+        }
+    }
+
+    private boolean isValidEmail(String emailAddress, String regexPattern) {
         return Pattern.compile(regexPattern).matcher(emailAddress).matches();
     }
 
-    public void update(Integer id, EventBookingDto booking) {
-        if (isOverlap(booking)) {
+    public void updateDatetime(Integer id, EventDateTimeDto booking) {
+        if (!repo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist");
+        }
+        if (isOverlap(id, booking.getEventStartTime())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, booking.getEventStartTime() + " is overlap");
         } else {
             EventBooking newBooking = modelMapper.map(booking, EventBooking.class);
             EventBooking updatedBooking = repo.findById(id).map(oldBooking -> {
                 oldBooking.setEventStartTime(newBooking.getEventStartTime());
-                oldBooking.setEventNotes(newBooking.getEventNotes());
                 return oldBooking;
-            }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist"));
+            }).orElseThrow();
             repo.saveAndFlush(updatedBooking);
         }
     }
 
-    private boolean isOverlap(EventBookingDto newBooking) {
-        EventBooking booking = modelMapper.map(newBooking, EventBooking.class);
-        LocalTime startA = getStartTime(booking);
-        LocalTime endA = getEndTime(booking);
-        String date = booking.getEventStartTime().toLocalDate().toString();
-        Integer categoryId = booking.getEventCategory().getId();
+    public void updateNotes(Integer id, EventNotesDto notes) {
+        if (!repo.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist");
+        } else {
+            EventBooking newBooking = modelMapper.map(notes, EventBooking.class);
+            EventBooking updatedBooking = repo.findById(id).map(oldBooking -> {
+                oldBooking.setEventNotes(newBooking.getEventNotes());
+                return oldBooking;
+            }).orElseThrow();
+            repo.saveAndFlush(updatedBooking);
+        }
+    }
+
+    private boolean isOverlap(Integer id, LocalDateTime dateTime) {
+        LocalTime startA = getStartTime(dateTime);
+        LocalTime endA = getEndTime(dateTime, repo.getEventDurationById(id));
+        String date = dateTime.toLocalDate().toString();
+        Integer categoryId = repo.getEventCategoryIdById(id);
         List<EventBooking> bookings = repo.findAllByDateAndCategory(date, categoryId, startA.getHour());
 
-        if (bookings.isEmpty()) {
-            return false;
-        } else {
-            for (EventBooking book : bookings) {
-                LocalTime startB = getStartTime(book);
-                LocalTime endB = getEndTime(book);
-                if (startA.isBefore(endB) && endA.isAfter(startB)) return true;
-            }
+        if (bookings.isEmpty()) return false;
+        for (EventBooking booking : bookings) {
+            LocalTime startB = getStartTime(booking.getEventStartTime());
+            LocalTime endB = getEndTime(booking.getEventStartTime(), booking.getEventDuration());
+            if (startA.isBefore(endB) && endA.isAfter(startB)) return true;
         }
         return false;
     }
 
-    private LocalTime getStartTime(EventBooking booking) {
-        return booking.getEventStartTime().toLocalTime();
+    private LocalTime getStartTime(LocalDateTime dateTime) {
+        return dateTime.toLocalTime();
     }
 
-    private LocalTime getEndTime(EventBooking booking) {
-        long minutes = booking.getEventDuration().longValue();
-        return booking.getEventStartTime().toLocalTime().plusMinutes(minutes);
+    private LocalTime getEndTime(LocalDateTime dateTime, Integer duration) {
+        long minutes = duration.longValue();
+        return dateTime.toLocalTime().plusMinutes(minutes);
     }
 
     public void delete(Integer id) {
-        if (repo.existsById(id)) {
-            repo.deleteById(id);
-        } else {
+        if (!repo.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist");
+        } else {
+            repo.deleteById(id);
         }
     }
 }

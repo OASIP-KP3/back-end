@@ -23,7 +23,7 @@ public class EventBooking {
     @Column(name = "booking_name", nullable = false, length = 100)
     private String bookingName;
 
-    @Column(name = "booking_email", nullable = false, length = 45)
+    @Column(name = "booking_email", nullable = false, length = 64)
     private String bookingEmail;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
