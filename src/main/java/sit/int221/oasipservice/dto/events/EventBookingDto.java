@@ -34,7 +34,7 @@ public class EventBookingDto {
     }
 
     public EventBookingDto setEventNotes(String eventNotes) {
-        this.eventNotes = eventNotes.isBlank() ? null : eventNotes.trim();
+        this.eventNotes = eventNotes == null || eventNotes.isBlank() ? null : eventNotes.trim();
         return this;
     }
 }
