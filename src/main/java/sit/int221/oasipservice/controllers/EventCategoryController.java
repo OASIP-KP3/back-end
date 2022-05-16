@@ -1,6 +1,7 @@
 package sit.int221.oasipservice.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.services.EventCategoryService;
@@ -26,5 +27,11 @@ public class EventCategoryController {
     @GetMapping("/{id}")
     public CategoryDto getCategoryById(@PathVariable Integer id) {
         return service.getCategoryById(id);
+    }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "The type of parameter is invalid")
+    @ExceptionHandler(IllegalArgumentException.class)
+    public String handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ex.getMessage();
     }
 }

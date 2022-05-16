@@ -34,7 +34,7 @@ public class EventBookingController {
     }
 
     @PostMapping("")
-    @ResponseStatus(value = HttpStatus.CREATED, reason = "test")
+    @ResponseStatus(HttpStatus.CREATED)
     public void createEvent(@RequestBody EventBookingDto newBooking) {
         service.save(newBooking);
     }
@@ -52,5 +52,11 @@ public class EventBookingController {
     @PatchMapping("/notes/{id}")
     public void updateNotes(@PathVariable Integer id, @RequestBody EventNotesDto notes) {
         service.updateNotes(id, notes);
+    }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "The type of parameter is invalid")
+    @ExceptionHandler(IllegalArgumentException.class)
+    public String handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ex.getMessage();
     }
 }
