@@ -1,11 +1,13 @@
 package sit.int221.oasipservice.services;
 
+import org.hibernate.QueryException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.server.ServerWebInputException;
 import sit.int221.oasipservice.dto.events.EventBookingDto;
 import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
@@ -15,8 +17,10 @@ import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.repo.EventBookingRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -39,22 +43,22 @@ public class EventBookingService {
         return listMapper.mapList(bookings, EventListAllDto.class, modelMapper);
     }
 
-    public EventDetailsBaseDto getEventDetails(Integer id) {
+    public EventDetailsBaseDto getEventDetails(Integer id) throws QueryException {
         if (!repo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist");
+            throw new QueryException(id + " does not exist");
         } else {
             EventBooking booking = repo.getById(id);
             return modelMapper.map(booking, EventDetailsBaseDto.class);
         }
     }
 
-    public void save(EventBookingDto newBooking) {
+    public void save(EventBookingDto newBooking) throws ServerWebInputException, InputMismatchException {
         if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, newBooking.getEventStartTime() + " is overlap");
+            throw new ServerWebInputException(newBooking.getEventStartTime() + " is overlap");
         }
         String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
         if (!isValidEmail(newBooking.getBookingEmail(), regexPattern)) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newBooking.getBookingEmail() + " is a wrong format");
+            throw new InputMismatchException(newBooking.getBookingEmail() + " is a wrong format");
         } else {
             EventBooking booking = modelMapper.map(newBooking, EventBooking.class);
             repo.saveAndFlush(booking);
@@ -65,9 +69,9 @@ public class EventBookingService {
         return Pattern.compile(regexPattern).matcher(emailAddress).matches();
     }
 
-    public void updateDateTime(Integer id, EventDateTimeDto booking) {
+    public void updateDateTime(Integer id, EventDateTimeDto booking) throws QueryException, ServerWebInputException {
         if (!repo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist");
+            throw new QueryException(id + " does not exist");
         } else {
             EventBooking newBooking = modelMapper.map(booking, EventBooking.class);
             EventBooking updatedBooking = repo.findById(id).map(oldBooking -> {
@@ -76,7 +80,7 @@ public class EventBookingService {
                 if (oldBooking.getEventStartTime().equals(newBooking.getEventStartTime())) {
                     return oldBooking;
                 } else if (isOverlap(categoryId, newBooking.getEventStartTime(), duration)) {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT, newBooking.getEventStartTime() + " is overlap");
+                    throw new ServerWebInputException(newBooking.getEventStartTime() + " is overlap");
                 } else {
                     oldBooking.setEventStartTime(newBooking.getEventStartTime());
                     return oldBooking;
@@ -86,9 +90,9 @@ public class EventBookingService {
         }
     }
 
-    public void updateNotes(Integer id, EventNotesDto notes) {
+    public void updateNotes(Integer id, EventNotesDto notes) throws QueryException {
         if (!repo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist");
+            throw new QueryException(id + " does not exist");
         } else {
             EventBooking newBooking = modelMapper.map(notes, EventBooking.class);
             EventBooking updatedBooking = repo.findById(id).map(oldBooking -> {
@@ -122,9 +126,9 @@ public class EventBookingService {
         return dateTime.toLocalTime().plusMinutes(duration.longValue());
     }
 
-    public void delete(Integer id) {
+    public void delete(Integer id) throws QueryException {
         if (!repo.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist");
+            throw new QueryException(id + " does not exist");
         } else {
             repo.deleteById(id);
         }
