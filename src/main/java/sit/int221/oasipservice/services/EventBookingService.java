@@ -52,9 +52,9 @@ public class EventBookingService {
         }
     }
 
-    public void save(EventBookingDto newBooking) throws ServerWebInputException, InputMismatchException {
+    public void save(EventBookingDto newBooking) throws IllegalArgumentException, InputMismatchException {
         if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration())) {
-            throw new ServerWebInputException(newBooking.getEventStartTime() + " is overlap");
+            throw new IllegalArgumentException(newBooking.getEventStartTime() + " is overlap");
         }
         String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
         if (!isValidEmail(newBooking.getBookingEmail(), regexPattern)) {
@@ -69,7 +69,7 @@ public class EventBookingService {
         return Pattern.compile(regexPattern).matcher(emailAddress).matches();
     }
 
-    public void updateDateTime(Integer id, EventDateTimeDto booking) throws QueryException, ServerWebInputException {
+    public void updateDateTime(Integer id, EventDateTimeDto booking) throws QueryException, IllegalArgumentException {
         if (!repo.existsById(id)) {
             throw new QueryException(id + " does not exist");
         } else {
@@ -80,7 +80,7 @@ public class EventBookingService {
                 if (oldBooking.getEventStartTime().equals(newBooking.getEventStartTime())) {
                     return oldBooking;
                 } else if (isOverlap(categoryId, newBooking.getEventStartTime(), duration)) {
-                    throw new ServerWebInputException(newBooking.getEventStartTime() + " is overlap");
+                    throw new IllegalArgumentException(newBooking.getEventStartTime() + " is overlap");
                 } else {
                     oldBooking.setEventStartTime(newBooking.getEventStartTime());
                     return oldBooking;

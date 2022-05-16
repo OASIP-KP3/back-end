@@ -4,6 +4,7 @@ import org.hibernate.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
 import sit.int221.oasipservice.dto.events.EventBookingDto;
@@ -15,6 +16,7 @@ import sit.int221.oasipservice.services.EventBookingService;
 
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Objects;
 
 @CrossOrigin(origins = {"http://ip21kp3.sit.kmutt.ac.th", "http://localhost:3000", "http://intproj21.sit.kmutt.ac.th"})
 @RestController
@@ -48,8 +50,8 @@ public class EventBookingController {
     public void createEvent(@RequestBody EventBookingDto newBooking) {
         try {
             service.save(newBooking);
-        } catch (ServerWebInputException ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            throw new ServerWebInputException(ex.getMessage());
         } catch (InputMismatchException ex) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
         }
@@ -70,8 +72,8 @@ public class EventBookingController {
             service.updateDateTime(id, datetime);
         } catch (QueryException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
-        } catch (ServerWebInputException ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            throw new ServerWebInputException(ex.getMessage());
         }
     }
 
@@ -85,8 +87,8 @@ public class EventBookingController {
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "The type of parameter is invalid")
-    @ExceptionHandler(IllegalArgumentException.class)
-    public String handleIllegalArgumentException(IllegalArgumentException ex) {
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public String handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
         return ex.getMessage();
     }
 }
