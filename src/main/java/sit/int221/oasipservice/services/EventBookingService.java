@@ -4,10 +4,7 @@ import org.hibernate.QueryException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.server.ServerWebInputException;
 import sit.int221.oasipservice.dto.events.EventBookingDto;
 import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
@@ -17,7 +14,6 @@ import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.repo.EventBookingRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.InputMismatchException;

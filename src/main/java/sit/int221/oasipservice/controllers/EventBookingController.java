@@ -16,7 +16,6 @@ import sit.int221.oasipservice.services.EventBookingService;
 
 import java.util.InputMismatchException;
 import java.util.List;
-import java.util.Objects;
 
 @CrossOrigin(origins = {"http://ip21kp3.sit.kmutt.ac.th", "http://localhost:3000", "http://intproj21.sit.kmutt.ac.th"})
 @RestController
