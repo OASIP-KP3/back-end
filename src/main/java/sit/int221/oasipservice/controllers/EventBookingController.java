@@ -34,7 +34,7 @@ public class EventBookingController {
     }
 
     @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(value = HttpStatus.CREATED, reason = "test")
     public void createEvent(@RequestBody EventBookingDto newBooking) {
         service.save(newBooking);
     }
@@ -45,8 +45,8 @@ public class EventBookingController {
     }
 
     @PatchMapping("/datetime/{id}")
-    public void updateDatetime(@PathVariable Integer id, @RequestBody EventDateTimeDto datetime) {
-        service.updateDatetime(id, datetime);
+    public void updateDateTime(@PathVariable Integer id, @RequestBody EventDateTimeDto datetime) {
+        service.updateDateTime(id, datetime);
     }
 
     @PatchMapping("/notes/{id}")

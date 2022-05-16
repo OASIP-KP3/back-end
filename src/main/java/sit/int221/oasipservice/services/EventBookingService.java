@@ -49,7 +49,7 @@ public class EventBookingService {
     }
 
     public void save(EventBookingDto newBooking) {
-        if (isOverlap(newBooking.getId(), newBooking.getEventStartTime())) {
+        if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, newBooking.getEventStartTime() + " is overlap");
         }
         String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
@@ -65,20 +65,22 @@ public class EventBookingService {
         return Pattern.compile(regexPattern).matcher(emailAddress).matches();
     }
 
-    public void updateDatetime(Integer id, EventDateTimeDto booking) {
+    public void updateDateTime(Integer id, EventDateTimeDto booking) {
         if (!repo.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist");
         } else {
             EventBooking newBooking = modelMapper.map(booking, EventBooking.class);
             EventBooking updatedBooking = repo.findById(id).map(oldBooking -> {
+                Integer duration = repo.getEventDurationById(id);
+                Integer categoryId = repo.getEventCategoryIdById(id);
                 if (oldBooking.getEventStartTime().equals(newBooking.getEventStartTime())) {
                     return oldBooking;
-                } else if (isOverlap(id, newBooking.getEventStartTime())) {
+                } else if (isOverlap(categoryId, newBooking.getEventStartTime(), duration)) {
                     throw new ResponseStatusException(HttpStatus.CONFLICT, newBooking.getEventStartTime() + " is overlap");
                 } else {
                     oldBooking.setEventStartTime(newBooking.getEventStartTime());
+                    return oldBooking;
                 }
-                return oldBooking;
             }).orElseThrow();
             repo.saveAndFlush(updatedBooking);
         }
@@ -97,11 +99,10 @@ public class EventBookingService {
         }
     }
 
-    private boolean isOverlap(Integer id, LocalDateTime dateTime) {
+    private boolean isOverlap(Integer categoryId, LocalDateTime dateTime, Integer duration) {
         LocalTime startA = getStartTime(dateTime);
-        LocalTime endA = getEndTime(dateTime, repo.getEventDurationById(id));
+        LocalTime endA = getEndTime(dateTime, duration);
         String date = dateTime.toLocalDate().toString();
-        Integer categoryId = repo.getEventCategoryIdById(id);
         List<EventBooking> bookings = repo.findAllByDateAndCategory(date, categoryId, startA.getHour());
 
         if (bookings.isEmpty()) return false;
@@ -118,8 +119,7 @@ public class EventBookingService {
     }
 
     private LocalTime getEndTime(LocalDateTime dateTime, Integer duration) {
-        long minutes = duration.longValue();
-        return dateTime.toLocalTime().plusMinutes(minutes);
+        return dateTime.toLocalTime().plusMinutes(duration.longValue());
     }
 
     public void delete(Integer id) {
