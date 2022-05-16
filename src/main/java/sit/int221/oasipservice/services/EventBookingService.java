@@ -68,13 +68,16 @@ public class EventBookingService {
     public void updateDatetime(Integer id, EventDateTimeDto booking) {
         if (!repo.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, id + " does not exist");
-        }
-        if (isOverlap(id, booking.getEventStartTime())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, booking.getEventStartTime() + " is overlap");
         } else {
             EventBooking newBooking = modelMapper.map(booking, EventBooking.class);
             EventBooking updatedBooking = repo.findById(id).map(oldBooking -> {
-                oldBooking.setEventStartTime(newBooking.getEventStartTime());
+                if (oldBooking.getEventStartTime().equals(newBooking.getEventStartTime())) {
+                    return oldBooking;
+                } else if (isOverlap(id, newBooking.getEventStartTime())) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, newBooking.getEventStartTime() + " is overlap");
+                } else {
+                    oldBooking.setEventStartTime(newBooking.getEventStartTime());
+                }
                 return oldBooking;
             }).orElseThrow();
             repo.saveAndFlush(updatedBooking);
