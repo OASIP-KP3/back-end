@@ -18,14 +18,14 @@ public class ErrorResponse {
     private LocalDateTime timestamp;
     private HttpStatus status;
     private Integer statusCode;
-    private String errorMessage;
+    private String message;
     private List<ErrorObject> errors = new ArrayList<>();
 
-    public ErrorResponse(LocalDateTime timestamp, HttpStatus status, Integer statusCode, String errorMessage) {
+    public ErrorResponse(LocalDateTime timestamp, HttpStatus status, Integer statusCode, String message) {
         this.timestamp = timestamp;
         this.status = status;
         this.statusCode = statusCode;
-        this.errorMessage = errorMessage;
+        this.message = message;
     }
 
     public ErrorResponse(LocalDateTime timestamp, HttpStatus status, Integer statusCode, List<ErrorObject> errors) {
