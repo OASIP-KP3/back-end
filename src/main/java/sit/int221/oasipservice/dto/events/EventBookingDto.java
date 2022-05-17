@@ -5,10 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.*;
-import java.time.temporal.ChronoUnit;
-import java.util.Objects;
-import java.util.regex.Pattern;
+import javax.validation.constraints.*;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,20 +14,38 @@ import java.util.regex.Pattern;
 @Setter
 public class EventBookingDto {
     private Integer id;
-    private String bookingName;
-    private String bookingEmail;
-    private Integer categoryId;
-    private LocalDateTime eventStartTime;
-    private Integer eventDuration;
-    private String eventNotes;
 
-    public EventBookingDto setBookingEmail(String bookingEmail) {
-        this.bookingEmail = bookingEmail.trim();
-        return this;
-    }
+    @NotEmpty
+    @Size(min = 1, max = 100)
+    private String bookingName;
+
+    @NotEmpty
+    @Email(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
+    @Size(min = 1, max = 64)
+    private String bookingEmail;
+
+    @NotNull
+    private Integer categoryId;
+
+    @NotNull
+    @FutureOrPresent
+    private LocalDateTime eventStartTime;
+
+    @NotNull
+    @Min(1)
+    @Max(480)
+    private Integer eventDuration;
+
+    @Size(max = 500)
+    private String eventNotes;
 
     public EventBookingDto setBookingName(String bookingName) {
         this.bookingName = bookingName.trim();
+        return this;
+    }
+
+    public EventBookingDto setBookingEmail(String bookingEmail) {
+        this.bookingEmail = bookingEmail.trim();
         return this;
     }
 
