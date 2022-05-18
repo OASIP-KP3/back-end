@@ -35,10 +35,10 @@ public class ApplicationExceptionHandler {
         return new ErrorResponse(LocalDateTime.now(), HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(ServerWebInputException.class)
     public ErrorResponse handleServerWebInputException(ServerWebInputException ex) {
-        return new ErrorResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.value(), ex.getReason());
+        return new ErrorResponse(LocalDateTime.now(), HttpStatus.UNPROCESSABLE_ENTITY, HttpStatus.UNPROCESSABLE_ENTITY.value(), ex.getReason());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

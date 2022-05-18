@@ -45,12 +45,12 @@ public class EventBookingController {
         service.delete(id);
     }
 
-    @PatchMapping("/datetime/{id}")
+    @PatchMapping("/{id}/datetime")
     public EventDateTimeDto updateDateTime(@PathVariable Integer id, @Valid @RequestBody EventDateTimeDto dateTime) {
         return service.updateDateTime(id, dateTime);
     }
 
-    @PatchMapping("/notes/{id}")
+    @PatchMapping("/{id}/notes")
     public EventNotesDto updateNotes(@PathVariable Integer id, @Valid @RequestBody EventNotesDto notes) {
         return service.updateNotes(id, notes);
     }
