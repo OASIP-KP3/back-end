@@ -7,7 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.server.ServerWebInputException;
+import org.springframework.web.server.ResponseStatusException;
 import sit.int221.oasipservice.handlers.errors.ErrorObject;
 import sit.int221.oasipservice.handlers.errors.ErrorResponse;
 
@@ -36,9 +36,9 @@ public class ApplicationExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    @ExceptionHandler(ServerWebInputException.class)
-    public ErrorResponse handleServerWebInputException(ServerWebInputException ex) {
-        return new ErrorResponse(LocalDateTime.now(), HttpStatus.UNPROCESSABLE_ENTITY, HttpStatus.UNPROCESSABLE_ENTITY.value(), ex.getReason());
+    @ExceptionHandler(ResponseStatusException.class)
+    public ErrorResponse handleServerWebInputException(ResponseStatusException ex) {
+        return new ErrorResponse(LocalDateTime.now(), ex.getStatus(), ex.getRawStatusCode(), ex.getReason());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

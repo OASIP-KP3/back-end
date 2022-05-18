@@ -16,21 +16,21 @@ import java.util.List;
 @AllArgsConstructor
 public class ErrorResponse {
     private LocalDateTime timestamp;
-    private HttpStatus status;
+    private HttpStatus error;
     private Integer statusCode;
     private String message;
     private List<ErrorObject> errors = new ArrayList<>();
 
-    public ErrorResponse(LocalDateTime timestamp, HttpStatus status, Integer statusCode, String message) {
+    public ErrorResponse(LocalDateTime timestamp, HttpStatus error, Integer statusCode, String message) {
         this.timestamp = timestamp;
-        this.status = status;
+        this.error = error;
         this.statusCode = statusCode;
         this.message = message;
     }
 
-    public ErrorResponse(LocalDateTime timestamp, HttpStatus status, Integer statusCode, List<ErrorObject> errors) {
+    public ErrorResponse(LocalDateTime timestamp, HttpStatus error, Integer statusCode, List<ErrorObject> errors) {
         this.timestamp = timestamp;
-        this.status = status;
+        this.error = error;
         this.statusCode = statusCode;
         this.errors = errors;
     }

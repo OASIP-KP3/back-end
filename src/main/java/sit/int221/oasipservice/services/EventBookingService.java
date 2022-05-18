@@ -4,8 +4,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ServerWebInputException;
+import org.springframework.web.server.ResponseStatusException;
 import sit.int221.oasipservice.dto.events.EventBookingDto;
 import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
@@ -43,16 +44,16 @@ public class EventBookingService {
         return modelMapper.map(booking, EventDetailsBaseDto.class);
     }
 
-    public void save(EventBookingDto newBooking) throws ServerWebInputException {
+    public void save(EventBookingDto newBooking) throws ResponseStatusException {
         if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration())) {
-            throw new ServerWebInputException(newBooking.getEventStartTime() + " is overlap");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newBooking.getEventStartTime() + " is overlap");
         } else {
             EventBooking booking = modelMapper.map(newBooking, EventBooking.class);
             repo.saveAndFlush(booking);
         }
     }
 
-    public EventDateTimeDto updateDateTime(Integer id, EventDateTimeDto booking) throws ResourceNotFoundException, ServerWebInputException {
+    public EventDateTimeDto updateDateTime(Integer id, EventDateTimeDto booking) throws ResourceNotFoundException, ResponseStatusException {
         EventBooking newBooking = modelMapper.map(booking, EventBooking.class);
         EventBooking updatedBooking = repo.findById(id).map(oldBooking -> {
             Integer duration = repo.getEventDurationById(id);
@@ -60,7 +61,7 @@ public class EventBookingService {
             if (oldBooking.getEventStartTime().equals(newBooking.getEventStartTime())) {
                 return oldBooking;
             } else if (isOverlap(categoryId, newBooking.getEventStartTime(), duration)) {
-                throw new ServerWebInputException(newBooking.getEventStartTime() + " is overlap");
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newBooking.getEventStartTime() + " is overlap");
             } else {
                 oldBooking.setEventStartTime(newBooking.getEventStartTime());
                 return oldBooking;
