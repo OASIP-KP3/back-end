@@ -90,7 +90,7 @@ public class EventBookingService {
         LocalTime startA = getStartTime(dateTime);
         LocalTime endA = getEndTime(dateTime, duration);
         String date = dateTime.toLocalDate().toString();
-        List<EventBooking> bookings = repo.findAllByDateAndCategory(date, categoryId, startA.getHour());
+        List<EventBooking> bookings = repo.findAllByDateAndCategory(date, categoryId);
 
         if (bookings.isEmpty()) return false;
         for (EventBooking booking : bookings) {
