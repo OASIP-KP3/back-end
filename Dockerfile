@@ -1,5 +1,8 @@
 FROM openjdk:17-jdk-slim
-RUN dos2unix ./mvnw
+RUN mkdir app
+COPY . /app
+WORKDIR /app
+RUN chmod+x mvnw
 RUN ./mvnw clean
 RUN ./mvnw package
 ARG JAR_FILE=./target/*.jar
