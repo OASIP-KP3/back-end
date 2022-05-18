@@ -28,7 +28,7 @@ public class EventBookingDto {
     private Integer categoryId;
 
     @NotNull
-    @FutureOrPresent
+    @Future
     private LocalDateTime eventStartTime;
 
     @NotNull

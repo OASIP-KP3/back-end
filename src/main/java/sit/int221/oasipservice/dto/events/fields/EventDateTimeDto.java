@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +18,7 @@ public class EventDateTimeDto {
     private Integer id;
 
     @NotNull
-    @FutureOrPresent
+    @Future
     private LocalDateTime eventStartTime;
 
     public String getEventNewDate() {
