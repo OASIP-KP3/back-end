@@ -2,7 +2,7 @@ FROM openjdk:17-jdk-slim
 RUN mkdir app
 COPY . /app
 WORKDIR /app
-RUN chmod+x mvnw
+RUN chmod +x mvnw
 RUN ./mvnw clean
 RUN ./mvnw package
 ARG JAR_FILE=./target/*.jar
