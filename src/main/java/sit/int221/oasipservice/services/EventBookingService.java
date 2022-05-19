@@ -45,7 +45,7 @@ public class EventBookingService {
     }
 
     public void save(EventBookingDto newBooking) throws ResponseStatusException {
-        if (isOverlap(newBooking.getId(), newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration())) {
+        if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration())) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newBooking.getEventStartTime() + " is overlap");
         } else {
             EventBooking booking = modelMapper.map(newBooking, EventBooking.class);
@@ -90,7 +90,22 @@ public class EventBookingService {
         String date = dateTime.toLocalDate().toString();
         List<EventBooking> bookings = repo.findAllByDateAndCategory(date, categoryId, id);
 
-        if (bookings.isEmpty()) return false;
+        return checkOverlap(startA, endA, bookings);
+    }
+
+    private boolean isOverlap(Integer categoryId, LocalDateTime dateTime, Integer duration) {
+        LocalTime startA = getStartTime(dateTime);
+        LocalTime endA = getEndTime(dateTime, duration);
+        String date = dateTime.toLocalDate().toString();
+        List<EventBooking> bookings = repo.findAllByDateAndCategory(date, categoryId);
+
+        return checkOverlap(startA, endA, bookings);
+    }
+
+    private boolean checkOverlap(LocalTime startA, LocalTime endA, List<EventBooking> bookings) {
+        if (bookings.isEmpty()) {
+            return false;
+        }
         for (EventBooking booking : bookings) {
             LocalTime startB = getStartTime(booking.getEventStartTime());
             LocalTime endB = getEndTime(booking.getEventStartTime(), booking.getEventDuration());
