@@ -13,6 +13,7 @@ import sit.int221.oasipservice.services.EventBookingService;
 import javax.validation.Valid;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/events")
 public class EventBookingController {
