@@ -18,10 +18,12 @@ import java.util.List;
 
 @RestControllerAdvice
 public class ApplicationExceptionHandler {
+    private final String TIME_ZONE = "GMT+07:00";
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ErrorResponse handleInvalidArgument(MethodArgumentNotValidException ex) {
-        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
         List<ErrorObject> errors = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -34,21 +36,21 @@ public class ApplicationExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ResourceNotFoundException.class)
     public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException ex) {
-        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
         return new ErrorResponse(now, HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(ResponseStatusException.class)
     public ErrorResponse handleServerWebInputException(ResponseStatusException ex) {
-        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
         return new ErrorResponse(now, ex.getStatus(), ex.getRawStatusCode(), ex.getReason());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleGlobalException(Exception ex) {
-        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
         return new ErrorResponse(now, HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
     }
 }

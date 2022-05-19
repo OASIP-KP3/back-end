@@ -12,6 +12,7 @@ public class FutureValidator implements ConstraintValidator<FutureValidation, Lo
 
     @Override
     public boolean isValid(LocalDateTime dateTime, ConstraintValidatorContext context) {
-        return dateTime.isAfter(LocalDateTime.now(ZoneId.systemDefault()));
+        final String TIME_ZONE = "GMT+07:00";
+        return dateTime.isAfter(LocalDateTime.now(ZoneId.of(TIME_ZONE)));
     }
 }
