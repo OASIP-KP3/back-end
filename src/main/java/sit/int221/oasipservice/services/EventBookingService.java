@@ -45,7 +45,7 @@ public class EventBookingService {
     }
 
     public void save(EventBookingDto newBooking) throws ResponseStatusException {
-        if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration())) {
+        if (isOverlap(newBooking.getId(), newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration())) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newBooking.getEventStartTime() + " is overlap");
         } else {
             EventBooking booking = modelMapper.map(newBooking, EventBooking.class);
@@ -58,9 +58,7 @@ public class EventBookingService {
         EventBooking updatedBooking = repo.findById(id).map(oldBooking -> {
             Integer duration = repo.getEventDurationById(id);
             Integer categoryId = repo.getEventCategoryIdById(id);
-            if (oldBooking.getEventStartTime().equals(newBooking.getEventStartTime())) {
-                return oldBooking;
-            } else if (isOverlap(categoryId, newBooking.getEventStartTime(), duration)) {
+            if (isOverlap(id, categoryId, newBooking.getEventStartTime(), duration)) {
                 throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newBooking.getEventStartTime() + " is overlap");
             } else {
                 oldBooking.setEventStartTime(newBooking.getEventStartTime());
@@ -86,11 +84,11 @@ public class EventBookingService {
         repo.deleteById(id);
     }
 
-    private boolean isOverlap(Integer categoryId, LocalDateTime dateTime, Integer duration) {
+    private boolean isOverlap(Integer id, Integer categoryId, LocalDateTime dateTime, Integer duration) {
         LocalTime startA = getStartTime(dateTime);
         LocalTime endA = getEndTime(dateTime, duration);
         String date = dateTime.toLocalDate().toString();
-        List<EventBooking> bookings = repo.findAllByDateAndCategory(date, categoryId);
+        List<EventBooking> bookings = repo.findAllByDateAndCategory(date, categoryId, id);
 
         if (bookings.isEmpty()) return false;
         for (EventBooking booking : bookings) {

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sit.int221.oasipservice.annotations.FutureValidation;
 
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
@@ -28,7 +29,7 @@ public class EventBookingDto {
     private Integer categoryId;
 
     @NotNull
-    @Future
+    @FutureValidation
     private LocalDateTime eventStartTime;
 
     @NotNull
