@@ -1,14 +1,13 @@
 package sit.int221.oasipservice.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.services.EventCategoryService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -34,5 +33,11 @@ public class EventCategoryController {
     @GetMapping("/{id}/events")
     public List<EventListAllDto> getEventsByCategoryId(@PathVariable Integer id) {
         return service.getEventsByCategoryId(id);
+    }
+
+    @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createCategory(@Valid @RequestBody CategoryDto newCategory) {
+
     }
 }
