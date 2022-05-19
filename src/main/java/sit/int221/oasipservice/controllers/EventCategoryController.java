@@ -38,6 +38,6 @@ public class EventCategoryController {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public void createCategory(@Valid @RequestBody CategoryDto newCategory) {
-
+        // TODO: apply save method from service
     }
 }

@@ -36,9 +36,13 @@ public class EventCategoryService {
         return modelMapper.map(category, CategoryDto.class);
     }
 
-    public List<EventListAllDto> getEventsByCategoryId(Integer id) {
+    public List<EventListAllDto> getEventsByCategoryId(Integer id) throws ResourceNotFoundException {
         EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         category.getEventBookings().sort(Comparator.comparing(EventBooking::getEventStartTime).reversed());
         return listMapper.mapList(category.getEventBookings(), EventListAllDto.class, modelMapper);
+    }
+
+    public void save(CategoryDto newCategory) {
+        // TODO: edit save method
     }
 }
