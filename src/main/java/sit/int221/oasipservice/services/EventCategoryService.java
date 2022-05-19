@@ -6,10 +6,12 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
+import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
 import sit.int221.oasipservice.repo.EventCategoryRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -36,6 +38,7 @@ public class EventCategoryService {
 
     public List<EventListAllDto> getEventsByCategoryId(Integer id) {
         EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
+        category.getEventBookings().sort(Comparator.comparing(EventBooking::getEventStartTime).reversed());
         return listMapper.mapList(category.getEventBookings(), EventListAllDto.class, modelMapper);
     }
 }
