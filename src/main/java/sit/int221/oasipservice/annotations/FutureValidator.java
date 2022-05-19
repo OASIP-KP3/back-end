@@ -3,6 +3,7 @@ package sit.int221.oasipservice.annotations;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class FutureValidator implements ConstraintValidator<FutureValidation, LocalDateTime> {
     @Override
@@ -11,6 +12,6 @@ public class FutureValidator implements ConstraintValidator<FutureValidation, Lo
 
     @Override
     public boolean isValid(LocalDateTime dateTime, ConstraintValidatorContext context) {
-        return dateTime.isAfter(LocalDateTime.now());
+        return dateTime.isAfter(LocalDateTime.now(ZoneId.systemDefault()));
     }
 }

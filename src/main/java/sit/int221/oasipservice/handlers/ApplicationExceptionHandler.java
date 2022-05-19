@@ -12,6 +12,7 @@ import sit.int221.oasipservice.handlers.errors.ErrorObject;
 import sit.int221.oasipservice.handlers.errors.ErrorResponse;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,30 +21,34 @@ public class ApplicationExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ErrorResponse handleInvalidArgument(MethodArgumentNotValidException ex) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
         List<ErrorObject> errors = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.add(new ErrorObject(fieldName, errorMessage));
         });
-        return new ErrorResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.value(), errors);
+        return new ErrorResponse(now, HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.value(), errors);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ResourceNotFoundException.class)
     public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException ex) {
-        return new ErrorResponse(LocalDateTime.now(), HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        return new ErrorResponse(now, HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(ResponseStatusException.class)
     public ErrorResponse handleServerWebInputException(ResponseStatusException ex) {
-        return new ErrorResponse(LocalDateTime.now(), ex.getStatus(), ex.getRawStatusCode(), ex.getReason());
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        return new ErrorResponse(now, ex.getStatus(), ex.getRawStatusCode(), ex.getReason());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleGlobalException(Exception ex) {
-        return new ErrorResponse(LocalDateTime.now(), HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        return new ErrorResponse(now, HttpStatus.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
     }
 }
