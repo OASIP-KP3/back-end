@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sit.int221.oasipservice.dto.categories.EventCategoryDto;
+import sit.int221.oasipservice.dto.categories.CategoryDto;
 
-import java.time.*;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @AllArgsConstructor
@@ -19,7 +19,7 @@ public class EventDetailsBaseDto {
     private String bookingName;
     private String bookingEmail;
     @JsonIgnore
-    private EventCategoryDto eventCategory;
+    private CategoryDto eventCategory;
     private LocalDateTime eventStartTime;
     private Integer eventDuration;
     private String eventNotes;

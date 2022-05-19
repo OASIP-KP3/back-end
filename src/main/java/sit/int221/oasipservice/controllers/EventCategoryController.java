@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
+import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.services.EventCategoryService;
 
 import java.util.List;
@@ -28,5 +29,10 @@ public class EventCategoryController {
     @GetMapping("/{id}")
     public CategoryDto getCategoryById(@PathVariable Integer id) {
         return service.getCategoryById(id);
+    }
+
+    @GetMapping("/{id}/events")
+    public List<EventListAllDto> getEventsByCategoryId(@PathVariable Integer id) {
+        return service.getEventsByCategoryId(id);
     }
 }

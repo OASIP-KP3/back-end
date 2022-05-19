@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sit.int221.oasipservice.dto.events.EventBookingDto;
+import sit.int221.oasipservice.dto.events.EventListAllDto;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,5 +18,5 @@ public class EventCategoryDto {
     private String categoryName;
     private String categoryDescription;
     private Integer eventDuration;
-    private Set<EventBookingDto> eventBookings = new LinkedHashSet<>();
+    private List<EventListAllDto> eventBookings = new ArrayList<>();
 }

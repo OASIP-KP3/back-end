@@ -2,10 +2,10 @@ package sit.int221.oasipservice.services;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
+import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.entities.EventCategory;
 import sit.int221.oasipservice.repo.EventCategoryRepository;
 import sit.int221.oasipservice.utils.ListMapper;
@@ -29,8 +29,13 @@ public class EventCategoryService {
         return listMapper.mapList(repo.findAll(), CategoryDto.class, modelMapper);
     }
 
-    public CategoryDto getCategoryById(Integer id) {
-        EventCategory category = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public CategoryDto getCategoryById(Integer id) throws ResourceNotFoundException {
+        EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         return modelMapper.map(category, CategoryDto.class);
+    }
+
+    public List<EventListAllDto> getEventsByCategoryId(Integer id) {
+        EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
+        return listMapper.mapList(category.getEventBookings(), EventListAllDto.class, modelMapper);
     }
 }
