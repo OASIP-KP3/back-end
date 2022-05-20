@@ -63,5 +63,4 @@ public class EventCategoryController {
     public CategoryDurationDto updateDuration(@PathVariable Integer id, @Valid @RequestBody CategoryDurationDto duration) {
         return service.updateDuration(id, duration);
     }
-
 }
