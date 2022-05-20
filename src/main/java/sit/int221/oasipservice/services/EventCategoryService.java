@@ -3,7 +3,9 @@ package sit.int221.oasipservice.services;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.entities.EventBooking;
@@ -42,7 +44,16 @@ public class EventCategoryService {
         return listMapper.mapList(category.getEventBookings(), EventListAllDto.class, modelMapper);
     }
 
-    public void save(CategoryDto newCategory) {
-        // TODO: edit save method
+    public void save(CategoryDto newCategory) throws ResponseStatusException {
+        if (isUnique(newCategory.getCategoryName())) {
+            EventCategory category = modelMapper.map(newCategory, EventCategory.class);
+            repo.saveAndFlush(category);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newCategory.getCategoryName() + " is not unique");
+        }
+    }
+
+    private boolean isUnique(String categoryName) {
+        return !(repo.getAllCategoryName().contains(categoryName));
     }
 }
