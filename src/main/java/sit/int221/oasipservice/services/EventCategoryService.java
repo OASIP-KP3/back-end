@@ -48,11 +48,15 @@ public class EventCategoryService {
     }
 
     public void save(CategoryDto newCategory) throws ResponseStatusException {
-        if (isUnique(newCategory.getCategoryName())) {
-            EventCategory category = modelMapper.map(newCategory, EventCategory.class);
-            repo.saveAndFlush(category);
+        if (!(repo.existsById(newCategory.getId()))) {
+            if (isUnique(newCategory.getCategoryName())) {
+                EventCategory category = modelMapper.map(newCategory, EventCategory.class);
+                repo.saveAndFlush(category);
+            } else {
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newCategory.getCategoryName() + " is not unique");
+            }
         } else {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newCategory.getCategoryName() + " is not unique");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newCategory.getId() + " is not unique");
         }
     }
 
