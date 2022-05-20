@@ -40,4 +40,9 @@ public class EventCategoryController {
     public void createCategory(@Valid @RequestBody CategoryDto newCategory) {
         service.save(newCategory);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteCategory(@PathVariable Integer id) {
+        service.delete(id);
+    }
 }

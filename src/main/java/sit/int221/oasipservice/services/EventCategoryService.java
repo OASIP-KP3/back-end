@@ -56,4 +56,11 @@ public class EventCategoryService {
     private boolean isUnique(String categoryName) {
         return !(repo.getAllCategoryName().contains(categoryName));
     }
+
+    public void delete(Integer id) throws ResourceNotFoundException {
+        if (!repo.existsById(id)) {
+            throw new ResourceNotFoundException("ID " + id + " is not found");
+        }
+        repo.deleteById(id);
+    }
 }
