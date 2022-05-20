@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
+import sit.int221.oasipservice.dto.categories.fields.CategoryDescDto;
+import sit.int221.oasipservice.dto.categories.fields.CategoryDurationDto;
+import sit.int221.oasipservice.dto.categories.fields.CategoryNameDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.services.EventCategoryService;
 
@@ -46,10 +49,19 @@ public class EventCategoryController {
         service.delete(id);
     }
 
-    // @PatchMapping("/{id}/name")
+    @PatchMapping("/{id}/name")
+    public CategoryNameDto updateCategoryName(@PathVariable Integer id, @Valid @RequestBody CategoryNameDto categoryName) {
+        return service.updateCategoryName(id, categoryName);
+    }
 
-    // @PatchMapping("/{id}/description")
+    @PatchMapping("/{id}/description")
+    public CategoryDescDto updateCategoryDesc(@PathVariable Integer id, @Valid @RequestBody CategoryDescDto description) {
+        return service.updateCategoryDesc(id, description);
+    }
 
-    // @PatchMapping("/{id}/duration")
+    @PatchMapping("/{id}/duration")
+    public CategoryDurationDto updateDuration(@PathVariable Integer id, @Valid @RequestBody CategoryDurationDto duration) {
+        return service.updateDuration(id, duration);
+    }
 
 }
