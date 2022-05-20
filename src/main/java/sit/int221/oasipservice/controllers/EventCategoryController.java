@@ -45,4 +45,11 @@ public class EventCategoryController {
     public void deleteCategory(@PathVariable Integer id) {
         service.delete(id);
     }
+
+    // @PatchMapping("/{id}/name")
+
+    // @PatchMapping("/{id}/description")
+
+    // @PatchMapping("/{id}/duration")
+
 }
