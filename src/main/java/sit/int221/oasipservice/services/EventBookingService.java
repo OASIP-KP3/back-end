@@ -84,6 +84,31 @@ public class EventBookingService {
         repo.deleteById(id);
     }
 
+    public List<EventListAllDto> getEventsBy(String type) throws ResourceNotFoundException {
+        if (type.equals("future")) {
+            return getFutureEvents();
+        } else if (type.equals("past")) {
+            return getPastEvents();
+        } else {
+            throw new ResourceNotFoundException("Type " + type + " is not supported");
+        }
+    }
+
+    private List<EventListAllDto> getFutureEvents() {
+        List<EventBooking> bookings = repo.getFutureEvents();
+        return listMapper.mapList(bookings, EventListAllDto.class, modelMapper);
+    }
+
+    private List<EventListAllDto> getPastEvents() {
+        List<EventBooking> bookings = repo.getPastEvents();
+        return listMapper.mapList(bookings, EventListAllDto.class, modelMapper);
+    }
+
+    public List<EventListAllDto> getEventsByDate(String date) {
+        List<EventBooking> bookings = repo.findAllByByDate(date);
+        return listMapper.mapList(bookings, EventListAllDto.class, modelMapper);
+    }
+
     private boolean isOverlap(Integer id, Integer categoryId, LocalDateTime dateTime, Integer duration) {
         LocalTime startA = getStartTime(dateTime);
         LocalTime endA = getEndTime(dateTime, duration);

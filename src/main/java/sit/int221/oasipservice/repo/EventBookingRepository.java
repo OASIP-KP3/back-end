@@ -27,4 +27,20 @@ public interface EventBookingRepository extends JpaRepository<EventBooking, Inte
     @Query(value = "SELECT event_category " +
             "FROM event_booking WHERE booking_id = ?1", nativeQuery = true)
     Integer getEventCategoryIdById(Integer id);
+
+    @Query(value = "SELECT * FROM event_booking " +
+            "WHERE date(event_start_time) = ?1 " +
+            "ORDER BY event_start_time", nativeQuery = true)
+    List<EventBooking> findAllByByDate(String date);
+
+    @Query(value = "SELECT * FROM event_booking " +
+            "WHERE event_start_time < now() " +
+            "ORDER BY event_start_time DESC", nativeQuery = true)
+    List<EventBooking> getPastEvents();
+
+    @Query(value = "SELECT * FROM event_booking " +
+            "WHERE event_start_time >= DATE_FORMAT(now(), '%Y-%m-%d %H:%i') " +
+            "ORDER BY event_start_time", nativeQuery = true)
+    List<EventBooking> getFutureEvents();
+
 }
