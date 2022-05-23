@@ -49,17 +49,17 @@ public class EventCategoryController {
         service.delete(id);
     }
 
-    @PatchMapping("/{id}/name")
+    @PatchMapping("/{id}/names")
     public CategoryNameDto updateCategoryName(@PathVariable Integer id, @Valid @RequestBody CategoryNameDto categoryName) {
         return service.updateCategoryName(id, categoryName);
     }
 
-    @PatchMapping("/{id}/description")
+    @PatchMapping("/{id}/descriptions")
     public CategoryDescDto updateCategoryDesc(@PathVariable Integer id, @Valid @RequestBody CategoryDescDto description) {
         return service.updateCategoryDesc(id, description);
     }
 
-    @PatchMapping("/{id}/duration")
+    @PatchMapping("/{id}/durations")
     public CategoryDurationDto updateDuration(@PathVariable Integer id, @Valid @RequestBody CategoryDurationDto duration) {
         return service.updateDuration(id, duration);
     }

@@ -54,12 +54,12 @@ public class EventBookingController {
         return service.updateNotes(id, notes);
     }
 
-    @GetMapping("/type")
+    @GetMapping("/types")
     public List<EventListAllDto> getEventsBy(@RequestParam(defaultValue = "future") String type) {
         return service.getEventsBy(type);
     }
 
-    @GetMapping("/date/{date}")
+    @GetMapping("/dates/{date}")
     public List<EventListAllDto> getEventsByDate(@PathVariable String date) {
         return service.getEventsByDate(date);
     }
