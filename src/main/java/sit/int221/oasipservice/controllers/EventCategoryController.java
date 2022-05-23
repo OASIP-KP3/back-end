@@ -34,8 +34,11 @@ public class EventCategoryController {
     }
 
     @GetMapping("/{id}/events")
-    public List<EventListAllDto> getEventsByCategoryId(@PathVariable Integer id) {
-        return service.getEventsByCategoryId(id);
+    public List<EventListAllDto> getEventsByCategoryId(
+            @PathVariable Integer id,
+            @RequestParam(name = "date", required = false) String date,
+            @RequestParam(name = "type", required = false) String type) {
+        return service.getEventsBy(id, date, type);
     }
 
     @PostMapping("")

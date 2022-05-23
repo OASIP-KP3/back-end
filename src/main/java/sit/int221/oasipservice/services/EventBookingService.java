@@ -85,13 +85,12 @@ public class EventBookingService {
     }
 
     public List<EventListAllDto> getEventsBy(String type) throws ResourceNotFoundException {
-        if (type.equals("future")) {
-            return getFutureEvents();
-        } else if (type.equals("past")) {
-            return getPastEvents();
-        } else {
-            throw new ResourceNotFoundException("Type " + type + " is not supported");
-        }
+        return switch (type) {
+            case "future" -> getFutureEvents();
+            case "past" -> getPastEvents();
+            case "all" -> getEventListSorted();
+            default -> throw new ResourceNotFoundException("Type " + type + " is not supported");
+        };
     }
 
     private List<EventListAllDto> getFutureEvents() {
