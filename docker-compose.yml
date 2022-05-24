@@ -5,7 +5,7 @@ services:
     restart: on-failure
     env_file:
       - ./.env
-    ports:
+    expose:
       - "8080"
     container_name: oasip-app
     environment:
