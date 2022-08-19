@@ -5,11 +5,11 @@ import javax.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = FutureValidator.class)
+@Constraint(validatedBy = UniqueEmailValidator.class)
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FutureValidation {
-    String message() default "must be a date and time in the future";
+public @interface UniqueEmail {
+    String message() default "Email is already registered";
 
     Class<?>[] groups() default {};
 

@@ -33,6 +33,13 @@ public class ApplicationExceptionHandler {
         return new ErrorResponse(now, HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.value(), errors);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ErrorResponse handleIllegalArgumentException(IllegalArgumentException ex) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
+        return new ErrorResponse(now, HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+    }
+
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ResourceNotFoundException.class)
     public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException ex) {

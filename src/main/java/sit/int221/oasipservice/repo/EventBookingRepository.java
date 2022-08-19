@@ -1,6 +1,7 @@
 package sit.int221.oasipservice.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import sit.int221.oasipservice.entities.EventBooking;
 
