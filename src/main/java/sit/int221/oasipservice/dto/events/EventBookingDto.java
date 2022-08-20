@@ -46,7 +46,7 @@ public class EventBookingDto {
     }
 
     public EventBookingDto setBookingEmail(String bookingEmail) {
-        this.bookingEmail = bookingEmail.trim();
+        this.bookingEmail = bookingEmail.toLowerCase();
         return this;
     }
 

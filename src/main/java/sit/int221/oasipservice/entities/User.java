@@ -6,7 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
@@ -36,9 +36,9 @@ public class User {
 
     @CreationTimestamp
     @Column(name = "createdOn", nullable = false)
-    private LocalDateTime createdOn;
+    private OffsetDateTime createdOn;
 
     @UpdateTimestamp
     @Column(name = "updatedOn", nullable = false)
-    private LocalDateTime updatedOn;
+    private OffsetDateTime updatedOn;
 }

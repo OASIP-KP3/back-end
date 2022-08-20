@@ -9,6 +9,7 @@ import sit.int221.oasipservice.dto.users.UserListPageDto;
 import sit.int221.oasipservice.services.UserService;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v2/users")
@@ -45,5 +46,8 @@ public class UserController {
         service.delete(id);
     }
 
-//    @PatchMapping("/{id}")
+    @PatchMapping("/{id}")
+    public UserDetailsDto partialUpdateUser(@PathVariable Integer id, @RequestBody Map<String, Object> body) {
+        return service.update(id, body);
+    }
 }

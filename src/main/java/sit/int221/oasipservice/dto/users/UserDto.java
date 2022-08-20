@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sit.int221.oasipservice.annotations.UniqueEmail;
 import sit.int221.oasipservice.annotations.UniqueUsername;
+import sit.int221.oasipservice.enumtype.Role;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
@@ -39,7 +40,26 @@ public class UserDto {
     }
 
     public UserDto setUserEmail(String userEmail) {
-        this.userEmail = userEmail.trim();
+        this.userEmail = userEmail.toLowerCase();
         return this;
+    }
+
+    public UserDto setUserRole(String userRole) {
+        if (userRole == null || userRole.isBlank() || !existsByRole(userRole)) {
+            this.userRole = Role.STUDENT.getRole();
+        } else {
+            this.userRole = userRole.trim().toLowerCase();
+        }
+        return this;
+    }
+
+    private boolean existsByRole(String userRole) {
+        String temp = userRole.trim().toLowerCase();
+        for (Role role : Role.values()) {
+            if (temp.equals(role.getRole())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
