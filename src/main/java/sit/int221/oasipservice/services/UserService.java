@@ -89,10 +89,9 @@ public class UserService {
                 case "userRole" -> {
                     String role = (String) value;
                     if (role == null || role.isBlank() || !existsByRole(role)) {
-                        user.setUserRole(Role.STUDENT.getRole());
-                    } else {
-                        user.setUserRole(role.trim().toLowerCase());
+                        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, role + " is not defined");
                     }
+                    user.setUserRole(role.trim().toLowerCase());
                 }
                 default -> throw new IllegalArgumentException("Unknown field: " + field);
             }
