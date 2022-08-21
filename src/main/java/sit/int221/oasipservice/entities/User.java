@@ -37,9 +37,9 @@ public class User {
 
     @CreationTimestamp
     @Column(name = "createdOn", nullable = false)
-    private LocalDateTime createdOn;
+    private OffsetDateTime createdOn;
 
     @UpdateTimestamp
     @Column(name = "updatedOn", nullable = false)
-    private LocalDateTime updatedOn;
+    private OffsetDateTime updatedOn;
 }
