@@ -88,7 +88,10 @@ public class UserService {
                 }
                 case "userRole" -> {
                     String role = (String) value;
-                    if (role == null || role.isBlank() || !existsByRole(role)) {
+                    if (role == null || role.isBlank()) {
+                        throw new IllegalArgumentException(field + " is must not be null or empty");
+                    }
+                    if (!existsByRole(role)) {
                         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, role + " is not defined");
                     }
                     user.setUserRole(role.trim().toLowerCase());
