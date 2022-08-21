@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @AllArgsConstructor
@@ -16,6 +17,6 @@ public class UserDetailsDto {
     private String userName;
     private String userEmail;
     private String userRole;
-    private OffsetDateTime createdOn;
-    private OffsetDateTime updatedOn;
+    private LocalDateTime createdOn;
+    private LocalDateTime updatedOn;
 }
