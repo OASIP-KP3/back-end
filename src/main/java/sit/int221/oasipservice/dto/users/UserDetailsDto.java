@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,11 +20,11 @@ public class UserDetailsDto {
     private OffsetDateTime createdOn;
     private OffsetDateTime updatedOn;
 
-    public String getCreatedOn() {
-        return createdOn.toString();
+    public void setCreatedOn(OffsetDateTime createdOn) {
+        this.createdOn = OffsetDateTime.of(createdOn.toLocalDateTime(), ZoneOffset.ofHours(7));
     }
 
-    public String getUpdatedOn() {
-        return updatedOn.toString();
+    public void setUpdatedOn(OffsetDateTime updatedOn) {
+        this.updatedOn = OffsetDateTime.of(updatedOn.toLocalDateTime(), ZoneOffset.ofHours(7));
     }
 }
