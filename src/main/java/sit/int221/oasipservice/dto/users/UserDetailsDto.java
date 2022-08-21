@@ -21,10 +21,10 @@ public class UserDetailsDto {
     private OffsetDateTime updatedOn;
 
     public void setCreatedOn(OffsetDateTime createdOn) {
-        this.createdOn = OffsetDateTime.of(createdOn.toLocalDateTime(), ZoneOffset.ofHours(7));
+        this.createdOn = createdOn.withOffsetSameLocal(ZoneOffset.ofHours(7)).plusHours(7);
     }
 
     public void setUpdatedOn(OffsetDateTime updatedOn) {
-        this.updatedOn = OffsetDateTime.of(updatedOn.toLocalDateTime(), ZoneOffset.ofHours(7));
+        this.updatedOn = updatedOn.withOffsetSameLocal(ZoneOffset.ofHours(7)).plusHours(7);
     }
 }
