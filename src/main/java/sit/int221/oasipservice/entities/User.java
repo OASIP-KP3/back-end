@@ -2,11 +2,10 @@ package sit.int221.oasipservice.entities;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Getter
 @Setter
@@ -19,6 +18,8 @@ import java.time.LocalDateTime;
         @UniqueConstraint(columnNames = {"user_name", "user_email"})
 })
 public class User {
+    private final String TIME_ZONE = "GMT+07:00";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
@@ -34,11 +35,19 @@ public class User {
     @Column(name = "user_role", nullable = false)
     private String userRole;
 
-    @CreationTimestamp
     @Column(name = "createdOn", nullable = false)
     private LocalDateTime createdOn;
 
-    @UpdateTimestamp
     @Column(name = "updatedOn", nullable = false)
     private LocalDateTime updatedOn;
+
+    @PrePersist
+    public void setCreatedOn() {
+        this.createdOn = LocalDateTime.now(ZoneId.of(TIME_ZONE));
+    }
+
+    @PreUpdate
+    public void setUpdatedOn() {
+        this.updatedOn = LocalDateTime.now(ZoneId.of(TIME_ZONE));
+    }
 }
