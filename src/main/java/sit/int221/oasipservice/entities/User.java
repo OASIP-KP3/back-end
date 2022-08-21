@@ -8,7 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 
 @Getter
 @Setter
@@ -38,17 +37,9 @@ public class User {
 
     @CreationTimestamp
     @Column(name = "createdOn", nullable = false)
-    private LocalDateTime createdOn;
+    private OffsetDateTime createdOn;
 
     @UpdateTimestamp
     @Column(name = "updatedOn", nullable = false)
-    private LocalDateTime updatedOn;
-
-    public void setCreatedOn(LocalDateTime createdOn) {
-        this.createdOn = OffsetDateTime.of(createdOn, ZoneOffset.ofHours(7)).toLocalDateTime();
-    }
-
-    public void setUpdatedOn(LocalDateTime updatedOn) {
-        this.updatedOn = OffsetDateTime.of(updatedOn, ZoneOffset.ofHours(7)).toLocalDateTime();
-    }
+    private OffsetDateTime updatedOn;
 }
