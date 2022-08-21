@@ -7,7 +7,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 
 @Getter
 @Setter
@@ -42,14 +41,4 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updatedOn", nullable = false)
     private OffsetDateTime updatedOn;
-
-    @PrePersist
-    public void setCreatedOn() {
-        this.createdOn = OffsetDateTime.now(ZoneOffset.ofHours(7));
-    }
-
-    @PreUpdate
-    public void setUpdatedOn() {
-        this.updatedOn = OffsetDateTime.now(ZoneOffset.ofHours(7));
-    }
 }
