@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sit.int221.oasipservice.annotations.IsRole;
 import sit.int221.oasipservice.annotations.UniqueEmail;
 import sit.int221.oasipservice.annotations.UniqueUsername;
 
@@ -31,6 +32,7 @@ public class UserDto {
     private String userEmail;
 
     @NotNull
+    @IsRole
     private String userRole;
 
     public UserDto setUserName(String userName) {
