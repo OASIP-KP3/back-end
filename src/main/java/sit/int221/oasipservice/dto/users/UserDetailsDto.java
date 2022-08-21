@@ -21,11 +21,11 @@ public class UserDetailsDto {
     private LocalDateTime createdOn;
     private LocalDateTime updatedOn;
 
-    public OffsetDateTime getCreatedOn() {
-        return OffsetDateTime.of(createdOn, ZoneOffset.ofHours(7));
+    public String getCreatedOn() {
+        return OffsetDateTime.of(createdOn, ZoneOffset.ofHours(7)).toString();
     }
 
-    public OffsetDateTime getUpdatedOn() {
-        return OffsetDateTime.of(updatedOn, ZoneOffset.ofHours(7));
+    public String getUpdatedOn() {
+        return OffsetDateTime.of(updatedOn, ZoneOffset.ofHours(7)).toString();
     }
 }
