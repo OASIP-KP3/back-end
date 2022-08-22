@@ -1,6 +1,5 @@
 package sit.int221.oasipservice.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -36,12 +35,10 @@ public class User {
     private String userRole;
 
     @CreationTimestamp
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "createdOn", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime createdOn;
 
     @UpdateTimestamp
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
+    @Column(name = "updatedOn", nullable = false, insertable = false)
     private OffsetDateTime updatedOn;
 }
