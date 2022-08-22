@@ -39,6 +39,6 @@ public class User {
     private OffsetDateTime createdOn;
 
     @UpdateTimestamp
-    @Column(name = "updatedOn", nullable = false, insertable = false, columnDefinition = "ON UPDATE CURRENT_TIMESTAMP")
+    @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime updatedOn;
 }
