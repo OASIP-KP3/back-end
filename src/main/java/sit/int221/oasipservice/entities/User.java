@@ -41,4 +41,12 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updatedOn", nullable = false)
     private OffsetDateTime updatedOn;
+
+    public void setCreatedOn(OffsetDateTime createdOn) {
+        this.createdOn = createdOn.plusHours(7);
+    }
+
+    public void setUpdatedOn(OffsetDateTime updatedOn) {
+        this.updatedOn = updatedOn.plusHours(7);
+    }
 }
