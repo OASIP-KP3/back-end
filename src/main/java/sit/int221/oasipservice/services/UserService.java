@@ -62,13 +62,10 @@ public class UserService {
                     if (username == null || username.isBlank()) {
                         throw new IllegalArgumentException(field + " is must not be null or empty");
                     }
-                    if (user.getUserName().equals(username)) {
-                        user.setUserName(user.getUserName());
-                    } else if (!isUsernameUnique(user.getUserName(), username)) {
+                    if (!isUsernameUnique(user.getUserName(), username)) {
                         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username " + username + " is not unique");
-                    } else {
-                        user.setUserName(username.trim());
                     }
+                    user.setUserName(username.trim());
                 }
                 case "userEmail" -> {
                     String email = (String) value;
@@ -78,13 +75,10 @@ public class UserService {
                     if (!isEmailValid(email)) {
                         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, email + " is not valid");
                     }
-                    if (user.getUserEmail().equals(email)) {
-                        user.setUserEmail(user.getUserEmail());
-                    } else if (!isEmailUnique(user.getUserEmail(), email)) {
+                    if (!isEmailUnique(user.getUserEmail(), email)) {
                         throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, email + " is not unique");
-                    } else {
-                        user.setUserEmail(email.toLowerCase());
                     }
+                    user.setUserEmail(email.toLowerCase());
                 }
                 case "userRole" -> {
                     String role = (String) value;
