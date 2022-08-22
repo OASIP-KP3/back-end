@@ -42,7 +42,7 @@ public class UserDetailsDto {
     }
 
     private String getLocalTime(OffsetDateTime dateTime) {
-        return dateTime.toLocalTime().toString();
+        return dateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
 
     private String getLocalDate(OffsetDateTime dateTime) {
