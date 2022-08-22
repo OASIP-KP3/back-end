@@ -35,10 +35,10 @@ public class User {
     private String userRole;
 
     @CreationTimestamp
-    @Column(name = "createdOn", nullable = false)
+    @Column(name = "createdOn", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime createdOn;
 
     @UpdateTimestamp
-    @Column(name = "updatedOn", nullable = false)
+    @Column(name = "updatedOn", nullable = false, insertable = false)
     private OffsetDateTime updatedOn;
 }
