@@ -13,7 +13,7 @@ import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
 import sit.int221.oasipservice.dto.events.EventListPageDto;
 import sit.int221.oasipservice.dto.events.EventPartialUpdateDto;
 import sit.int221.oasipservice.entities.EventBooking;
-import sit.int221.oasipservice.repo.EventBookingRepository;
+import sit.int221.oasipservice.repositories.EventBookingRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
 import java.time.LocalDateTime;

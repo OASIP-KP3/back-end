@@ -1,4 +1,4 @@
-package sit.int221.oasipservice;
+package sit.int221.oasipservice.configurations;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

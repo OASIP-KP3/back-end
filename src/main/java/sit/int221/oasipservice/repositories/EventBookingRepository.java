@@ -1,12 +1,13 @@
-package sit.int221.oasipservice.repo;
+package sit.int221.oasipservice.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import sit.int221.oasipservice.entities.EventBooking;
 
 import java.util.List;
 
+@Repository
 public interface EventBookingRepository extends JpaRepository<EventBooking, Integer> {
     @Query(value = "SELECT * FROM event_booking " +
             "WHERE date(event_start_time) = ?1 " +

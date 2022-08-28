@@ -13,8 +13,8 @@ import sit.int221.oasipservice.dto.categories.fields.CategoryNameDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
-import sit.int221.oasipservice.repo.EventBookingRepository;
-import sit.int221.oasipservice.repo.EventCategoryRepository;
+import sit.int221.oasipservice.repositories.EventBookingRepository;
+import sit.int221.oasipservice.repositories.EventCategoryRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
 import java.util.Comparator;

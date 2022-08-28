@@ -6,14 +6,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.oasipservice.dto.users.UserDetailsDto;
 import sit.int221.oasipservice.dto.users.UserDto;
 import sit.int221.oasipservice.dto.users.UserListPageDto;
+import sit.int221.oasipservice.dto.users.UserLoginDto;
 import sit.int221.oasipservice.entities.User;
 import sit.int221.oasipservice.enumtype.Role;
-import sit.int221.oasipservice.repo.UserRepository;
+import sit.int221.oasipservice.exceptions.UnauthorizedException;
+import sit.int221.oasipservice.repositories.UserRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
 import java.util.Map;
@@ -24,12 +28,14 @@ public class UserService {
     private final UserRepository repo;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository repo, ModelMapper modelMapper, ListMapper listMapper) {
+    public UserService(UserRepository repo, ModelMapper modelMapper, ListMapper listMapper, PasswordEncoder passwordEncoder) {
         this.repo = repo;
         this.modelMapper = modelMapper;
         this.listMapper = listMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserListPageDto getUsers(int page, int pageSize, String sortBy) {
@@ -50,7 +56,28 @@ public class UserService {
     }
 
     public void save(UserDto newUser) {
-        repo.saveAndFlush(modelMapper.map(newUser, User.class));
+        repo.saveAndFlush(populateUser(newUser));
+    }
+
+    private User populateUser(UserDto userData) {
+        User user = new User();
+        user.setUserName(userData.getUserName());
+        user.setUserEmail(userData.getUserEmail());
+        user.setUserRole(userData.getUserRole());
+        user.setUserPassword(passwordEncoder.encode(userData.getUserPassword()));
+        return user;
+    }
+
+    public ResponseEntity<String> matcher(UserLoginDto body) throws ResourceNotFoundException, UnauthorizedException {
+        User user = repo.findByUserEmail(body.getUserEmail());
+        if (user == null) {
+            throw new ResourceNotFoundException(body.getUserEmail() + " is not found");
+        }
+        String password = repo.getPasswordByEmail(body.getUserEmail());
+        if (!passwordEncoder.matches(body.getUserPassword(), password)) {
+            throw new UnauthorizedException("Password is not matched");
+        }
+        return ResponseEntity.ok("Password is matched");
     }
 
     public UserDetailsDto update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException, ResponseStatusException, IllegalArgumentException {

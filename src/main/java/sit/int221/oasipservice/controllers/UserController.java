@@ -2,10 +2,12 @@ package sit.int221.oasipservice.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.dto.users.UserDetailsDto;
 import sit.int221.oasipservice.dto.users.UserDto;
 import sit.int221.oasipservice.dto.users.UserListPageDto;
+import sit.int221.oasipservice.dto.users.UserLoginDto;
 import sit.int221.oasipservice.services.UserService;
 
 import javax.validation.Valid;
@@ -49,5 +51,10 @@ public class UserController {
     @PatchMapping("/{id}")
     public UserDetailsDto partialUpdateUser(@PathVariable Integer id, @RequestBody Map<String, Object> body) {
         return service.update(id, body);
+    }
+
+    @PostMapping("/match")
+    public ResponseEntity<String> login(@Valid @RequestBody UserLoginDto body) {
+        return service.matcher(body);
     }
 }

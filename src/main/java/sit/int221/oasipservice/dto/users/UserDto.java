@@ -20,11 +20,13 @@ import javax.validation.constraints.Size;
 public class UserDto {
     private Integer id;
 
+    @NotNull
     @NotEmpty
     @Size(min = 1, max = 100)
     @UniqueUsername
     private String userName;
 
+    @NotNull
     @NotEmpty
     @Email(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
     @Size(min = 1, max = 50)
@@ -32,8 +34,14 @@ public class UserDto {
     private String userEmail;
 
     @NotNull
+    @NotEmpty
     @IsRole
     private String userRole;
+
+    @NotEmpty
+    @NotNull
+    @Size(min = 8, max = 14)
+    private String userPassword;
 
     public UserDto setUserName(String userName) {
         this.userName = userName.trim();
@@ -47,6 +55,11 @@ public class UserDto {
 
     public UserDto setUserRole(String userRole) {
         this.userRole = userRole.trim().toLowerCase();
+        return this;
+    }
+
+    public UserDto setUserPassword(String userPassword) {
+        this.userPassword = userPassword.trim();
         return this;
     }
 }

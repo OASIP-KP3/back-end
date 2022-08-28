@@ -2,7 +2,7 @@ package sit.int221.oasipservice.annotations;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sit.int221.oasipservice.repo.UserRepository;
+import sit.int221.oasipservice.repositories.UserRepository;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
