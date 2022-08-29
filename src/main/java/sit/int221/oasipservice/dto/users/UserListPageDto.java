@@ -8,7 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 public class UserListPageDto {
-    private List<UserDto> content;
+    private List<UserViewDto> content;
     private int number;
     private int size;
     private int totalPages;

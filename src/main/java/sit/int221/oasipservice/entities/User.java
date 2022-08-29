@@ -1,6 +1,5 @@
 package sit.int221.oasipservice.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -35,7 +34,6 @@ public class User {
     @Column(name = "user_role", nullable = false)
     private String userRole;
 
-    @JsonIgnore
     @Column(name = "user_password", nullable = false, length = 100)
     private String userPassword;
 
