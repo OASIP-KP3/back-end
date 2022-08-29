@@ -7,7 +7,6 @@ import lombok.Setter;
 import sit.int221.oasipservice.annotations.IsRole;
 import sit.int221.oasipservice.annotations.UniqueEmail;
 import sit.int221.oasipservice.annotations.UniqueUsername;
-import sit.int221.oasipservice.enumtype.Role;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
@@ -56,8 +55,7 @@ public class UserDto {
     }
 
     public UserDto setUserRole(String userRole) {
-        final String ROLE = userRole.trim().toUpperCase(Locale.US);
-        this.userRole = Role.valueOf(ROLE).getRole();
+        this.userRole = userRole.trim().toLowerCase(Locale.US);
         return this;
     }
 

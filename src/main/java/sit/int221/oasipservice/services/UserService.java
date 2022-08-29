@@ -61,9 +61,10 @@ public class UserService {
 
     private User populateUser(UserDto userData) {
         User user = new User();
+        final String ROLE = userData.getUserRole().toUpperCase(Locale.US);
         user.setUserName(userData.getUserName());
         user.setUserEmail(userData.getUserEmail());
-        user.setUserRole(userData.getUserRole());
+        user.setUserRole(Role.valueOf(ROLE).getRole());
         user.setUserPassword(passwordEncoder.encode(userData.getUserPassword()));
         return user;
     }
