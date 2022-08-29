@@ -1,5 +1,6 @@
 package sit.int221.oasipservice.dto.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class UserLoginDto {
     @Size(min = 1, max = 50)
     private String userEmail;
 
+    @JsonIgnore
     @NotNull
     @NotEmpty
     @Size(min = 8, max = 14)

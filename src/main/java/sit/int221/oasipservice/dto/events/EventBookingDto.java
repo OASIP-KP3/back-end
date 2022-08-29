@@ -16,10 +16,12 @@ import java.time.LocalDateTime;
 public class EventBookingDto {
     private Integer id;
 
+    @NotNull
     @NotEmpty
     @Size(min = 1, max = 100)
     private String bookingName;
 
+    @NotNull
     @NotEmpty
     @Email(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
     @Size(min = 1, max = 64)

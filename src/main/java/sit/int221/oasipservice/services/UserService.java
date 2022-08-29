@@ -5,11 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import sit.int221.oasipservice.dto.users.UserDetailsDto;
 import sit.int221.oasipservice.dto.users.UserDto;
 import sit.int221.oasipservice.dto.users.UserListPageDto;
@@ -17,9 +15,11 @@ import sit.int221.oasipservice.dto.users.UserLoginDto;
 import sit.int221.oasipservice.entities.User;
 import sit.int221.oasipservice.enumtype.Role;
 import sit.int221.oasipservice.exceptions.UnauthorizedException;
+import sit.int221.oasipservice.exceptions.UnprocessableException;
 import sit.int221.oasipservice.repositories.UserRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -80,7 +80,7 @@ public class UserService {
         return ResponseEntity.ok("Password is matched");
     }
 
-    public UserDetailsDto update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException, ResponseStatusException, IllegalArgumentException {
+    public UserDetailsDto update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException, UnprocessableException, IllegalArgumentException {
         User user = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         changes.forEach((field, value) -> {
             switch (field) {
@@ -90,7 +90,7 @@ public class UserService {
                         throw new IllegalArgumentException(field + " is must not be null or empty");
                     }
                     if (!isUsernameUnique(user.getUserName(), username)) {
-                        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username " + username + " is not unique");
+                        throw new UnprocessableException("Username " + username + " is not unique");
                     }
                     user.setUserName(username.trim());
                 }
@@ -100,12 +100,12 @@ public class UserService {
                         throw new IllegalArgumentException(field + " is must not be null or empty");
                     }
                     if (!isEmailValid(email)) {
-                        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, email + " is not valid");
+                        throw new UnprocessableException(email + " is not valid");
                     }
                     if (!isEmailUnique(user.getUserEmail(), email)) {
-                        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, email + " is not unique");
+                        throw new UnprocessableException(email + " is not unique");
                     }
-                    user.setUserEmail(email.toLowerCase());
+                    user.setUserEmail(email.toLowerCase(Locale.US));
                 }
                 case "userRole" -> {
                     String role = (String) value;
@@ -113,9 +113,10 @@ public class UserService {
                         throw new IllegalArgumentException(field + " is must not be null or empty");
                     }
                     if (!existsByRole(role)) {
-                        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, role + " is not defined");
+                        throw new UnprocessableException(role + " is not defined");
                     }
-                    user.setUserRole(role.trim().toLowerCase());
+                    final String ROLE = role.trim().toUpperCase(Locale.US);
+                    user.setUserRole(Role.valueOf(ROLE).getRole());
                 }
                 default -> throw new IllegalArgumentException("Unknown field: " + field);
             }

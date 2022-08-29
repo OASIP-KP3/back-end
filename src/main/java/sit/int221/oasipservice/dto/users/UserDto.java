@@ -1,5 +1,6 @@
 package sit.int221.oasipservice.dto.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,11 +8,13 @@ import lombok.Setter;
 import sit.int221.oasipservice.annotations.IsRole;
 import sit.int221.oasipservice.annotations.UniqueEmail;
 import sit.int221.oasipservice.annotations.UniqueUsername;
+import sit.int221.oasipservice.enumtype.Role;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Locale;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,6 +41,7 @@ public class UserDto {
     @IsRole
     private String userRole;
 
+    @JsonIgnore
     @NotEmpty
     @NotNull
     @Size(min = 8, max = 14)
@@ -49,12 +53,13 @@ public class UserDto {
     }
 
     public UserDto setUserEmail(String userEmail) {
-        this.userEmail = userEmail.toLowerCase();
+        this.userEmail = userEmail.toLowerCase(Locale.US);
         return this;
     }
 
     public UserDto setUserRole(String userRole) {
-        this.userRole = userRole.trim().toLowerCase();
+        final String ROLE = userRole.trim().toUpperCase(Locale.US);
+        this.userRole = Role.valueOf(ROLE).getRole();
         return this;
     }
 
