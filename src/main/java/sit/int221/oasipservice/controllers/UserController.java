@@ -2,8 +2,8 @@ package sit.int221.oasipservice.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sit.int221.oasipservice.dto.JwtResponseDto;
 import sit.int221.oasipservice.dto.users.UserDetailsDto;
 import sit.int221.oasipservice.dto.users.UserDto;
 import sit.int221.oasipservice.dto.users.UserListPageDto;
@@ -54,7 +54,7 @@ public class UserController {
     }
 
     @PostMapping("/match")
-    public ResponseEntity<String> login(@Valid @RequestBody UserLoginDto body) {
+    public JwtResponseDto login(@Valid @RequestBody UserLoginDto body) {
         return service.matcher(body);
     }
 }
