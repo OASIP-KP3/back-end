@@ -14,8 +14,24 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
+    private String secretKey;
+    private int jwtExpirationInMs;
+    private int refreshExpirationInMs;
+
     @Value("${jwt.secret}")
-    private String SECRET_KEY;
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
+    }
+
+    @Value("${jwt.expirationInMs}")
+    public void setJwtExpirationInMs(int jwtExpirationInMs) {
+        this.jwtExpirationInMs = jwtExpirationInMs;
+    }
+
+    @Value("${jwt.refreshExpirationInMs}")
+    public void setRefreshExpirationInMs(int refreshExpirationInMs) {
+        this.refreshExpirationInMs = refreshExpirationInMs;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -31,7 +47,7 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -46,8 +62,14 @@ public class JwtUtil {
 
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
+                .signWith(SignatureAlgorithm.HS256, secretKey).compact();
+    }
+
+    public String createRefreshToken(Map<String, Object> claims, String subject) {
+        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + refreshExpirationInMs))
+                .signWith(SignatureAlgorithm.HS256, secretKey).compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

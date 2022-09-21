@@ -1,16 +1,11 @@
 package sit.int221.oasipservice.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import sit.int221.oasipservice.dto.JwtResponseDto;
 import sit.int221.oasipservice.dto.users.UserDetailsDto;
-import sit.int221.oasipservice.dto.users.UserDto;
 import sit.int221.oasipservice.dto.users.UserListPageDto;
-import sit.int221.oasipservice.dto.users.UserLoginDto;
 import sit.int221.oasipservice.services.UserService;
 
-import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
@@ -37,12 +32,6 @@ public class UserController {
         return service.getUserDetails(id);
     }
 
-    @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createUser(@Valid @RequestBody UserDto newUser) {
-        service.save(newUser);
-    }
-
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Integer id) {
         service.delete(id);
@@ -51,10 +40,5 @@ public class UserController {
     @PatchMapping("/{id}")
     public UserDetailsDto partialUpdateUser(@PathVariable Integer id, @RequestBody Map<String, Object> body) {
         return service.update(id, body);
-    }
-
-    @PostMapping("/login")
-    public JwtResponseDto login(@Valid @RequestBody UserLoginDto body) {
-        return service.login(body);
     }
 }

@@ -5,23 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import sit.int221.oasipservice.dto.JwtResponseDto;
 import sit.int221.oasipservice.dto.users.UserDetailsDto;
-import sit.int221.oasipservice.dto.users.UserDto;
 import sit.int221.oasipservice.dto.users.UserListPageDto;
-import sit.int221.oasipservice.dto.users.UserLoginDto;
 import sit.int221.oasipservice.entities.User;
 import sit.int221.oasipservice.enumtype.Role;
-import sit.int221.oasipservice.exceptions.UnauthorizedException;
 import sit.int221.oasipservice.exceptions.UnprocessableException;
 import sit.int221.oasipservice.repositories.UserRepository;
-import sit.int221.oasipservice.utils.JwtUtil;
-import sit.int221.oasipservice.utils.ListMapper;
 
 import java.util.Locale;
 import java.util.Map;
@@ -31,21 +22,13 @@ import java.util.regex.Pattern;
 public class UserService {
     private final UserRepository repo;
     private final ModelMapper modelMapper;
-    private final ListMapper listMapper;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
-    private final AuthenticationManager authManager;
-    private final MyUserDetailsService userService;
 
     @Autowired
-    public UserService(UserRepository repo, ModelMapper modelMapper, ListMapper listMapper, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, AuthenticationManager authManager, MyUserDetailsService userService) {
+    public UserService(UserRepository repo, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
         this.repo = repo;
         this.modelMapper = modelMapper;
-        this.listMapper = listMapper;
         this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-        this.authManager = authManager;
-        this.userService = userService;
     }
 
     public UserListPageDto getUsers(int page, int pageSize, String sortBy) {
@@ -63,32 +46,6 @@ public class UserService {
     public UserDetailsDto getUserDetails(Integer id) throws ResourceNotFoundException {
         User user = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         return modelMapper.map(user, UserDetailsDto.class);
-    }
-
-    public void save(UserDto newUser) {
-        repo.saveAndFlush(populateUser(newUser));
-    }
-
-    private User populateUser(UserDto userData) {
-        User user = new User();
-        final String ROLE = userData.getUserRole().toUpperCase(Locale.US);
-        user.setUserName(userData.getUserName());
-        user.setUserEmail(userData.getUserEmail());
-        user.setUserRole(Role.valueOf(ROLE).getRole());
-        user.setUserPassword(passwordEncoder.encode(userData.getUserPassword()));
-        return user;
-    }
-
-    public JwtResponseDto login(UserLoginDto body) throws ResourceNotFoundException, UnauthorizedException {
-        User user = repo.findByUserEmail(body.getUserEmail());
-        if (user == null) {
-            throw new ResourceNotFoundException(body.getUserEmail() + " is not found");
-        }
-        String password = repo.getPasswordByEmail(body.getUserEmail());
-        if (!passwordEncoder.matches(body.getUserPassword(), password)) {
-            throw new UnauthorizedException("Password is not matched");
-        }
-        return new JwtResponseDto(generateToken(body));
     }
 
     public UserDetailsDto update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException, UnprocessableException, IllegalArgumentException {
@@ -133,12 +90,6 @@ public class UserService {
             }
         });
         return modelMapper.map(repo.saveAndFlush(user), UserDetailsDto.class);
-    }
-
-    private String generateToken(UserLoginDto user) {
-        authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUserEmail(), user.getUserPassword()));
-        final UserDetails USER_DETAILS = userService.loadUserByUsername(user.getUserEmail());
-        return jwtUtil.generateToken(USER_DETAILS);
     }
 
     private boolean isUsernameUnique(String oldUsername, String newUsername) {

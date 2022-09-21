@@ -1,4 +1,4 @@
-package sit.int221.oasipservice.dto;
+package sit.int221.oasipservice.dto.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
