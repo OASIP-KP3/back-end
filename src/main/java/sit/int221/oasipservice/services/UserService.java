@@ -79,7 +79,7 @@ public class UserService {
         return user;
     }
 
-    public JwtResponseDto matcher(UserLoginDto body) throws ResourceNotFoundException, UnauthorizedException {
+    public JwtResponseDto login(UserLoginDto body) throws ResourceNotFoundException, UnauthorizedException {
         User user = repo.findByUserEmail(body.getUserEmail());
         if (user == null) {
             throw new ResourceNotFoundException(body.getUserEmail() + " is not found");

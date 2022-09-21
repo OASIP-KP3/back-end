@@ -53,8 +53,8 @@ public class UserController {
         return service.update(id, body);
     }
 
-    @PostMapping("/match")
+    @PostMapping("/login")
     public JwtResponseDto login(@Valid @RequestBody UserLoginDto body) {
-        return service.matcher(body);
+        return service.login(body);
     }
 }
