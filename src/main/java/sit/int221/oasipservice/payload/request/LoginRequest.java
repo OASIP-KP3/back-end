@@ -1,4 +1,4 @@
-package sit.int221.oasipservice.dto.users;
+package sit.int221.oasipservice.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserLoginDto {
+public class LoginRequest {
     @NotNull
     @NotEmpty
     @Email(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")

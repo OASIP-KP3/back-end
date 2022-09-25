@@ -1,41 +1,28 @@
 package sit.int221.oasipservice.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import sit.int221.oasipservice.dto.jwt.JwtResponseDto;
-import sit.int221.oasipservice.dto.users.UserDto;
-import sit.int221.oasipservice.dto.users.UserLoginDto;
-import sit.int221.oasipservice.services.MyUserDetailsService;
-import sit.int221.oasipservice.utils.JwtUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import sit.int221.oasipservice.payload.request.LoginRequest;
+import sit.int221.oasipservice.payload.response.JwtResponse;
+import sit.int221.oasipservice.services.AuthService;
 
 import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v2/auth")
+@RequiredArgsConstructor
 public class AuthController {
-    private final MyUserDetailsService userService;
-    private final JwtUtil jwtUtil;
-
-    @Autowired
-    public AuthController(MyUserDetailsService userService, JwtUtil jwtUtil) {
-        this.userService = userService;
-        this.jwtUtil = jwtUtil;
-    }
+    private final AuthService service;
 
     @PostMapping("/login")
-    public JwtResponseDto login(@Valid @RequestBody UserLoginDto body) {
-        return userService.login(body);
+    public JwtResponse login(@Valid @RequestBody LoginRequest request) {
+        return service.login(request);
     }
 
-    @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createUser(@Valid @RequestBody UserDto newUser) {
-        userService.save(newUser);
+    @PostMapping("/logout")
+    public void logout() {
     }
-
-//    @PostMapping("/refresh")
-//    public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequestDto request) {
-//        return null;
-//    }
 }

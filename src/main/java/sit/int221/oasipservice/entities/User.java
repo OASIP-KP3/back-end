@@ -7,6 +7,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,10 +32,6 @@ public class User {
     @Column(name = "user_email", nullable = false, length = 50, unique = true)
     private String userEmail;
 
-    @Lob
-    @Column(name = "user_role", nullable = false)
-    private String userRole;
-
     @Column(name = "user_password", nullable = false, length = 100)
     private String userPassword;
 
@@ -44,4 +42,20 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime updatedOn;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List<Role> userRoles = new ArrayList<>();
+
+    public void addRole(Role role) {
+        this.userRoles.add(role);
+    }
+
+    public void updateRole(Role role) {
+        this.userRoles.clear();
+        this.userRoles.add(role);
+    }
 }

@@ -1,11 +1,21 @@
 package sit.int221.oasipservice.annotations;
 
-import sit.int221.oasipservice.enumtype.Role;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import sit.int221.oasipservice.repositories.RoleRepository;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+@Component
 public class IsRoleValidator implements ConstraintValidator<IsRole, String> {
+
+    private final RoleRepository repo;
+
+    @Autowired
+    public IsRoleValidator(RoleRepository repo) {
+        this.repo = repo;
+    }
 
     @Override
     public void initialize(IsRole constraintAnnotation) {
@@ -13,12 +23,6 @@ public class IsRoleValidator implements ConstraintValidator<IsRole, String> {
 
     @Override
     public boolean isValid(String userRole, ConstraintValidatorContext context) {
-        String temp = userRole.trim().toLowerCase();
-        for (Role role : Role.values()) {
-            if (temp.equals(role.getRole())) {
-                return true;
-            }
-        }
-        return false;
+        return repo.findByRoleName(userRole) != null;
     }
 }

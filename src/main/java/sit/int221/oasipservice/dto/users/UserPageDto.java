@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class UserListPageDto {
+public class UserPageDto {
     private List<UserViewDto> content;
     private int number;
     private int size;

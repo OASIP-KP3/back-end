@@ -1,4 +1,4 @@
-package sit.int221.oasipservice.dto.jwt;
+package sit.int221.oasipservice.payload.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class JwtResponseDto {
-    private String token;
+public class JwtResponse {
+    private String accessToken;
+    private String refreshToken;
 }

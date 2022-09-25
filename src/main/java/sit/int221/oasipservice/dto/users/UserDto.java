@@ -36,26 +36,26 @@ public class UserDto {
 
     @NotNull
     @NotEmpty
-    @IsRole
-    private String userRole;
-
-    @NotEmpty
-    @NotNull
     @Size(min = 8, max = 14)
     private String userPassword;
+
+    @NotNull
+    @NotEmpty
+    @IsRole
+    private String userRole;
 
     public UserDto setUserName(String userName) {
         this.userName = userName.trim();
         return this;
     }
 
-    public UserDto setUserEmail(String userEmail) {
-        this.userEmail = userEmail.toLowerCase(Locale.US);
+    public UserDto setUserRole(String userRole) {
+        this.userRole = userRole.trim().toLowerCase(Locale.US);
         return this;
     }
 
-    public UserDto setUserRole(String userRole) {
-        this.userRole = userRole.trim().toLowerCase(Locale.US);
+    public UserDto setUserEmail(String userEmail) {
+        this.userEmail = userEmail.toLowerCase(Locale.US);
         return this;
     }
 
