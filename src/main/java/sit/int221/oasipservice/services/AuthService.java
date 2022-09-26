@@ -28,7 +28,7 @@ public class AuthService {
     public JwtResponse login(LoginRequest request) throws ResourceNotFoundException, UnauthorizedException {
         String email = request.getUserEmail();
         String password = request.getUserPassword();
-        log.info("Attempting to authenticate with " + email + " and " + passwordEncoder.encode(password));
+        log.info("Attempting to authenticate with " + email);
         User user = userRepo.findByUserEmail(email);
         if (user == null) throw new ResourceNotFoundException(email + " is not found");
         if (!passwordEncoder.matches(password, user.getUserPassword()))
