@@ -1,11 +1,9 @@
 package sit.int221.oasipservice.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.dto.users.UserDetailsDto;
-import sit.int221.oasipservice.dto.users.UserDto;
 import sit.int221.oasipservice.dto.users.UserPageDto;
 import sit.int221.oasipservice.payload.request.LoginRequest;
 import sit.int221.oasipservice.services.UserService;
@@ -38,12 +36,6 @@ public class UserController {
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Integer id) {
         service.delete(id);
-    }
-
-    @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createUser(@Valid @RequestBody UserDto newUser) {
-        service.save(newUser);
     }
 
     @PatchMapping("/{id}")

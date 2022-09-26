@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sit.int221.oasipservice.dto.users.UserDetailsDto;
-import sit.int221.oasipservice.dto.users.UserDto;
 import sit.int221.oasipservice.dto.users.UserPageDto;
 import sit.int221.oasipservice.entities.Role;
 import sit.int221.oasipservice.entities.User;
@@ -102,12 +101,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void save(UserDto newUser) {
-        log.info("Saving a new user to the database...");
-        userRepo.saveAndFlush(populateUser(newUser));
-    }
-
-    @Override
     public void addRoleToUser(String email, String roleName) {
         User user = userRepo.findByUserEmail(email);
         Role role = roleRepo.findByRoleName(roleName);
@@ -129,15 +122,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (!passwordEncoder.matches(password, user.getUserPassword()))
             throw new UnauthorizedException("Password is incorrect");
         return ResponseEntity.ok().body("Password is matched");
-    }
-
-    private User populateUser(UserDto userData) {
-        User user = new User();
-        user.setUserName(userData.getUserName());
-        user.setUserEmail(userData.getUserEmail());
-        user.addRole(roleRepo.findByRoleName(userData.getUserRole()));
-        user.setUserPassword(passwordEncoder.encode(userData.getUserPassword()));
-        return user;
     }
 
     private boolean isUsernameUnique(String oldUsername, String newUsername) {

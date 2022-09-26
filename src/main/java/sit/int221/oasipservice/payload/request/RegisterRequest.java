@@ -1,4 +1,4 @@
-package sit.int221.oasipservice.dto.users;
+package sit.int221.oasipservice.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +18,7 @@ import java.util.Locale;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserDto {
+public class RegisterRequest {
     private Integer id;
 
     @NotNull
@@ -44,22 +44,22 @@ public class UserDto {
     @IsRole
     private String userRole;
 
-    public UserDto setUserName(String userName) {
+    public RegisterRequest setUserName(String userName) {
         this.userName = userName.trim();
         return this;
     }
 
-    public UserDto setUserRole(String userRole) {
+    public RegisterRequest setUserRole(String userRole) {
         this.userRole = userRole.trim().toLowerCase(Locale.US);
         return this;
     }
 
-    public UserDto setUserEmail(String userEmail) {
+    public RegisterRequest setUserEmail(String userEmail) {
         this.userEmail = userEmail.toLowerCase(Locale.US);
         return this;
     }
 
-    public UserDto setUserPassword(String userPassword) {
+    public RegisterRequest setUserPassword(String userPassword) {
         this.userPassword = userPassword.trim();
         return this;
     }

@@ -75,8 +75,9 @@ public class JwtUtil {
     }
 
     public JwtResponse generateToken(UserDetails userDetails) {
+        String tokenType = "Bearer";
         String accessToken = generateAccessToken(userDetails);
         String refreshToken = generateRefreshToken(userDetails);
-        return new JwtResponse(accessToken, refreshToken);
+        return new JwtResponse(accessToken, refreshToken, tokenType);
     }
 }
