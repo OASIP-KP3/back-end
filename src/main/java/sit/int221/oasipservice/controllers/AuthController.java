@@ -2,12 +2,15 @@ package sit.int221.oasipservice.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.payload.request.LoginRequest;
 import sit.int221.oasipservice.payload.request.RegisterRequest;
 import sit.int221.oasipservice.payload.response.JwtResponse;
 import sit.int221.oasipservice.services.AuthService;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RestController
@@ -27,7 +30,8 @@ public class AuthController {
         service.save(newUser);
     }
 
-    @PostMapping("/logout")
-    public void logout() {
+    @GetMapping("/token/refresh")
+    public JwtResponse refreshToken(HttpServletRequest request, HttpServletResponse response) throws ServletRequestBindingException {
+        return service.refreshToken(request, response);
     }
 }

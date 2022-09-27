@@ -8,8 +8,6 @@ import sit.int221.oasipservice.dto.users.UserPageDto;
 import sit.int221.oasipservice.payload.request.LoginRequest;
 import sit.int221.oasipservice.services.UserService;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.Map;
 
@@ -46,10 +44,5 @@ public class UserController {
     @PostMapping("/match")
     public ResponseEntity<String> matchPassword(@Valid @RequestBody LoginRequest request) {
         return service.matchPassword(request);
-    }
-
-    @PostMapping("/token/refresh")
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        service.refreshToken(request, response);
     }
 }

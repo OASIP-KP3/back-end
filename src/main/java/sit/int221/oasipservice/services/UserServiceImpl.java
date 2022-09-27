@@ -23,8 +23,6 @@ import sit.int221.oasipservice.payload.request.LoginRequest;
 import sit.int221.oasipservice.repositories.RoleRepository;
 import sit.int221.oasipservice.repositories.UserRepository;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
@@ -106,11 +104,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         Role role = roleRepo.findByRoleName(roleName);
         log.info("Adding role " + roleName + " to user id " + user.getId());
         user.getUserRoles().add(role);
-    }
-
-    @Override
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
-
     }
 
     @Override

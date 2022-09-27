@@ -1,8 +1,11 @@
 package sit.int221.oasipservice.handlers;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -67,6 +70,27 @@ public class ApplicationExceptionHandler {
     @ResponseStatus(UNAUTHORIZED)
     @ExceptionHandler(UnauthorizedException.class)
     public ErrorResponse handleUnauthorizedException(UnauthorizedException ex) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
+        return new ErrorResponse(now, UNAUTHORIZED, UNAUTHORIZED.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(UNAUTHORIZED)
+    @ExceptionHandler(TokenExpiredException.class)
+    public ErrorResponse handleTokenExpiredException(TokenExpiredException ex) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
+        return new ErrorResponse(now, UNAUTHORIZED, UNAUTHORIZED.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(UNAUTHORIZED)
+    @ExceptionHandler(JWTDecodeException.class)
+    public ErrorResponse handleJWTDecodeException(JWTDecodeException ex) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
+        return new ErrorResponse(now, UNAUTHORIZED, UNAUTHORIZED.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(UNAUTHORIZED)
+    @ExceptionHandler(ServletRequestBindingException.class)
+    public ErrorResponse handleServletRequestBindingException(ServletRequestBindingException ex) {
         LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
         return new ErrorResponse(now, UNAUTHORIZED, UNAUTHORIZED.value(), ex.getMessage());
     }

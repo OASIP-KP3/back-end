@@ -1,5 +1,7 @@
 package sit.int221.oasipservice.services;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -8,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.ServletRequestBindingException;
 import sit.int221.oasipservice.entities.User;
 import sit.int221.oasipservice.exceptions.UnauthorizedException;
 import sit.int221.oasipservice.payload.request.LoginRequest;
@@ -16,6 +19,9 @@ import sit.int221.oasipservice.payload.response.JwtResponse;
 import sit.int221.oasipservice.repositories.RoleRepository;
 import sit.int221.oasipservice.repositories.UserRepository;
 import sit.int221.oasipservice.utils.JwtUtil;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Service
 @Log4j2
@@ -31,13 +37,58 @@ public class AuthService {
     public JwtResponse login(LoginRequest request) throws ResourceNotFoundException, UnauthorizedException {
         String email = request.getUserEmail();
         String password = request.getUserPassword();
-        log.info("Attempting to authenticate with " + email);
         User user = userRepo.findByUserEmail(email);
-        if (user == null) throw new ResourceNotFoundException(email + " is not found");
-        if (!passwordEncoder.matches(password, user.getUserPassword()))
-            throw new UnauthorizedException("Password is incorrect");
+        if (user == null) {
+            String errorMessage = email + " is not found";
+            log.error(errorMessage);
+            throw new ResourceNotFoundException(errorMessage);
+        }
+        if (!passwordEncoder.matches(password, user.getUserPassword())) {
+            String errorMessage = "Password is incorrect";
+            log.error(errorMessage);
+            throw new UnauthorizedException(errorMessage);
+        }
         authManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+        log.info("Attempting to authenticate with " + email);
         return jwtUtil.generateToken(userService.loadUserByUsername(email));
+    }
+
+    public JwtResponse refreshToken(HttpServletRequest request, HttpServletResponse response) throws
+            ResourceNotFoundException,
+            TokenExpiredException,
+            JWTDecodeException,
+            ServletRequestBindingException {
+        if (!jwtUtil.isHeaderValid(request)) {
+            String errorMessage = "Invalid header value or missing authorization header";
+            log.error(errorMessage);
+            response.setHeader("Error", errorMessage);
+            throw new ServletRequestBindingException(errorMessage);
+        }
+        String refreshToken = jwtUtil.getToken(request);
+        String email = jwtUtil.getEmail(refreshToken);
+        if (refreshToken == null || email == null) {
+            String errorMessage = "Invalid refresh token";
+            log.error(errorMessage);
+            response.setHeader("Error", errorMessage);
+            throw new JWTDecodeException(errorMessage);
+        }
+        if (jwtUtil.isTokenExpired(refreshToken)) {
+            String errorMessage = "The Token has expired on ";
+            log.error(errorMessage + jwtUtil.getExpiresAt(refreshToken).toString());
+            response.setHeader("Error", errorMessage);
+            throw new TokenExpiredException(errorMessage, jwtUtil.getExpiresAt(refreshToken));
+        }
+        User user = userRepo.findByUserEmail(email);
+        if (user == null) {
+            String errorMessage = email + " is not found";
+            log.error(errorMessage);
+            response.setHeader("Error", errorMessage);
+            throw new ResourceNotFoundException(errorMessage);
+        }
+        String tokenType = "Bearer";
+        String accessToken = jwtUtil.generateAccessToken(userService.loadUserByUsername(email));
+        log.info("Renewing access token for user id " + user.getId());
+        return new JwtResponse(accessToken, refreshToken, tokenType);
     }
 
     public void save(RegisterRequest newUser) {

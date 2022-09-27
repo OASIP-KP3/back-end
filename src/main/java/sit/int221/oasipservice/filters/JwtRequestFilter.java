@@ -21,7 +21,6 @@ import java.util.Collection;
 
 import static java.util.Arrays.stream;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Log4j2
 @Component
@@ -34,8 +33,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (matchPath(request.getServletPath())) {
             filterChain.doFilter(request, response);
         } else {
-            if (isHeaderValid(request)) {
-                String token = getToken(request);
+            if (jwtUtil.isHeaderValid(request)) {
+                String token = jwtUtil.getToken(request);
                 try {
                     String email = jwtUtil.getEmail(token);
                     String[] roles = jwtUtil.getRoles(token);
@@ -65,19 +64,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private boolean matchPath(String path) {
         final String AUTH_PATH = "/api/v2/auth/";
         final String MATCH_PATH = "/api/v2/users/match";
-        final String REFRESH_TOKEN_PATH = "/api/v2/users/token/refresh";
-        return path.startsWith(AUTH_PATH) || path.equals(MATCH_PATH) || path.equals(REFRESH_TOKEN_PATH);
-    }
-
-    private boolean isHeaderValid(HttpServletRequest request) {
-        final String START_HEADER = "Bearer ";
-        String header = request.getHeader(AUTHORIZATION);
-        return header != null && header.startsWith(START_HEADER);
-    }
-
-    private String getToken(HttpServletRequest request) {
-        final String START_HEADER = "Bearer ";
-        String header = request.getHeader(AUTHORIZATION);
-        return header.substring(START_HEADER.length());
+        return path.startsWith(AUTH_PATH) || path.equals(MATCH_PATH);
     }
 }

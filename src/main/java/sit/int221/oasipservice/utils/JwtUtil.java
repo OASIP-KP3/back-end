@@ -10,9 +10,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import sit.int221.oasipservice.payload.response.JwtResponse;
 
+import javax.servlet.http.HttpServletRequest;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Component
 public class JwtUtil {
@@ -79,5 +83,25 @@ public class JwtUtil {
         String accessToken = generateAccessToken(userDetails);
         String refreshToken = generateRefreshToken(userDetails);
         return new JwtResponse(accessToken, refreshToken, tokenType);
+    }
+
+    public boolean isHeaderValid(HttpServletRequest request) {
+        final String START_HEADER = "Bearer ";
+        String header = request.getHeader(AUTHORIZATION);
+        return header != null && header.startsWith(START_HEADER);
+    }
+
+    public boolean isTokenExpired(String token) {
+        return decodedJWT(token).getExpiresAt().before(new Date());
+    }
+
+    public Instant getExpiresAt(String token) {
+        return decodedJWT(token).getExpiresAt().toInstant();
+    }
+
+    public String getToken(HttpServletRequest request) {
+        final String START_HEADER = "Bearer ";
+        String header = request.getHeader(AUTHORIZATION);
+        return header.substring(START_HEADER.length());
     }
 }
