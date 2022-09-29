@@ -20,7 +20,7 @@ public class LoginRequest {
 
     @NotNull
     @NotEmpty
-    @Pattern(regexp = "^\\S*$", message = "white spaces do not allowed in the entire string")
+    @Pattern(regexp = "^\\S+$", message = "white spaces do not allowed in the entire string")
     @Size(min = 8, max = 14)
     private String userPassword;
 }

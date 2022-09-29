@@ -19,7 +19,7 @@ public class RegisterRequest {
 
     @NotNull
     @NotEmpty
-    @Pattern(regexp = "^\\S*$", message = "white spaces do not allowed in the entire string")
+    @Pattern(regexp = "^[^\s].+[^\s]$", message = "leading or trailing white spaces do not allowed in the string")
     @Size(min = 1, max = 100)
     @UniqueUsername
     private String userName;
@@ -33,13 +33,13 @@ public class RegisterRequest {
 
     @NotNull
     @NotEmpty
-    @Pattern(regexp = "^\\S*$", message = "white spaces do not allowed in the entire string")
+    @Pattern(regexp = "^\\S+$", message = "white spaces do not allowed in the entire string")
     @Size(min = 8, max = 14)
     private String userPassword;
 
     @NotNull
     @NotEmpty
-    @Pattern(regexp = "^\\S*$", message = "white spaces do not allowed in the entire string")
+    @Pattern(regexp = "^\\S+$", message = "white spaces do not allowed in the entire string")
     @IsRole
     private String userRole;
 }
