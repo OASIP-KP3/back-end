@@ -24,7 +24,7 @@ import sit.int221.oasipservice.repositories.RoleRepository;
 import sit.int221.oasipservice.repositories.UserRepository;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                         throw new IllegalArgumentException(field + " is must not be null or empty");
                     if (!isUsernameUnique(user.getUserName(), username))
                         throw new UnprocessableException("Username " + username + " is not unique");
-                    log.debug("Updating the username id " + id);
+                    log.info("Updating the username id " + id);
                     user.setUserName(username.trim());
                 }
                 case "userEmail" -> {
@@ -145,7 +145,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         } else {
             log.info("User found in the database");
         }
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         user.getUserRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getRoleName())));
         return new org.springframework.security.core.userdetails.User(user.getUserEmail(), user.getUserPassword(), authorities);
     }

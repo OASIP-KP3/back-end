@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import static java.util.Arrays.stream;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
@@ -55,7 +55,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     private void setAuthentication(String email, String[] roles) {
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         stream(roles).forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authToken);
