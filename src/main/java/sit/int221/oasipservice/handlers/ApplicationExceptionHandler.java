@@ -1,6 +1,7 @@
 package sit.int221.oasipservice.handlers;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.validation.FieldError;
@@ -84,6 +85,13 @@ public class ApplicationExceptionHandler {
     @ResponseStatus(UNAUTHORIZED)
     @ExceptionHandler(JWTDecodeException.class)
     public ErrorResponse handleJWTDecodeException(JWTDecodeException ex) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
+        return new ErrorResponse(now, UNAUTHORIZED, UNAUTHORIZED.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(UNAUTHORIZED)
+    @ExceptionHandler(SignatureVerificationException.class)
+    public ErrorResponse handleSignatureVerificationException(SignatureVerificationException ex) {
         LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
         return new ErrorResponse(now, UNAUTHORIZED, UNAUTHORIZED.value(), ex.getMessage());
     }

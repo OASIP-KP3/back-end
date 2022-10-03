@@ -1,6 +1,6 @@
 package sit.int221.oasipservice.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.dto.events.EventBookingDto;
@@ -13,14 +13,10 @@ import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v2/events")
 public class EventBookingControllerV2 {
     private final EventBookingServiceV2 service;
-
-    @Autowired
-    public EventBookingControllerV2(EventBookingServiceV2 service) {
-        this.service = service;
-    }
 
     // default sorting by "eventStartTime" in descending
     @GetMapping("")

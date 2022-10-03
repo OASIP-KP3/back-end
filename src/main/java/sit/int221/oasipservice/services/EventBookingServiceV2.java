@@ -1,7 +1,8 @@
 package sit.int221.oasipservice.services;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -23,17 +24,12 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Log4j2
+@RequiredArgsConstructor
 public class EventBookingServiceV2 {
     private final EventBookingRepository repo;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
-
-    @Autowired
-    public EventBookingServiceV2(EventBookingRepository repo, ModelMapper modelMapper, ListMapper listMapper) {
-        this.repo = repo;
-        this.modelMapper = modelMapper;
-        this.listMapper = listMapper;
-    }
 
     public EventListPageDto getEvents(int page, int pageSize, String sortBy) {
         Sort sort = Sort.by(sortBy).descending();

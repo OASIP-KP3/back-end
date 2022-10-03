@@ -1,7 +1,8 @@
 package sit.int221.oasipservice.services;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,19 +23,13 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Log4j2
+@RequiredArgsConstructor
 public class EventCategoryServiceV2 {
     private final EventBookingRepository bookingRepo;
     private final EventCategoryRepository repo;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
-
-    @Autowired
-    public EventCategoryServiceV2(EventBookingRepository bookingRepo, EventCategoryRepository repo, ModelMapper modelMapper, ListMapper listMapper) {
-        this.bookingRepo = bookingRepo;
-        this.repo = repo;
-        this.modelMapper = modelMapper;
-        this.listMapper = listMapper;
-    }
 
     public List<CategoryDto> getCategories() {
         return listMapper.mapList(repo.findAll(), CategoryDto.class, modelMapper);

@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v2/auth")
 @RequiredArgsConstructor
+@RequestMapping("/api/v2/auth")
 public class AuthController {
     private final AuthService service;
 
