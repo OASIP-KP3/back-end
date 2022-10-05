@@ -7,6 +7,4 @@ import sit.int221.oasipservice.entities.Role;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
     Role findByRoleName(String roleName);
-
-    boolean existsByRoleName(String roleName);
 }

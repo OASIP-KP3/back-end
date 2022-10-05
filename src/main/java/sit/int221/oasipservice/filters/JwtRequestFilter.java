@@ -16,10 +16,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static java.util.Arrays.stream;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 @Log4j2
@@ -55,10 +55,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     private void setAuthentication(String email, String[] roles) {
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        stream(roles).forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, null, authorities);
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+        List<SimpleGrantedAuthority> authorities = Arrays.stream(roles)
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+        SecurityContextHolder
+                .getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(email, null, authorities));
     }
 
     private boolean matchPath(String path) {

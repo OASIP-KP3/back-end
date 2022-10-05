@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sit.int221.oasipservice.entities.Role;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,5 +17,5 @@ public class UserViewDto {
     private Integer id;
     private String userName;
     private String userEmail;
-    private List<Role> userRoles = new ArrayList<>();
+    private Set<Role> userRoles = new LinkedHashSet<>();
 }

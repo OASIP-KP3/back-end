@@ -9,8 +9,8 @@ import sit.int221.oasipservice.entities.Role;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +20,7 @@ public class UserDetailsDto {
     private Integer id;
     private String userName;
     private String userEmail;
-    private List<Role> userRoles = new ArrayList<>();
+    private Set<Role> userRoles = new LinkedHashSet<>();
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private OffsetDateTime createdOn;

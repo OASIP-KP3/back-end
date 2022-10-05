@@ -23,11 +23,11 @@ import sit.int221.oasipservice.payload.request.LoginRequest;
 import sit.int221.oasipservice.repositories.RoleRepository;
 import sit.int221.oasipservice.repositories.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -87,7 +87,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     String role = (String) value;
                     if (role == null || role.isBlank())
                         throw new IllegalArgumentException(field + " is must not be null or empty");
-                    if (!roleRepo.existsByRoleName(role)) throw new UnprocessableException(role + " is not defined");
+                    if (roleRepo.findByRoleName(role) == null)
+                        throw new UnprocessableException(role + " is not defined");
                     final String ROLE = role.trim().toLowerCase(Locale.US);
                     log.info("Updating the role of user id " + id);
                     user.updateRole(roleRepo.findByRoleName(ROLE));
@@ -145,8 +146,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         } else {
             log.info("User found in the database");
         }
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        user.getUserRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getRoleName())));
+        List<SimpleGrantedAuthority> authorities = user.getUserRoles()
+                .stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
+                .collect(Collectors.toList());
         return new org.springframework.security.core.userdetails.User(user.getUserEmail(), user.getUserPassword(), authorities);
     }
 }

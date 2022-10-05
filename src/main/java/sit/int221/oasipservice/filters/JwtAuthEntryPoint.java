@@ -23,7 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        log.error("Unauthorized request from path: " + request.getServletPath());
+        log.error("Unauthorized request from path: " + request.getRequestURI());
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setStatus(SC_UNAUTHORIZED);
 
@@ -33,7 +33,7 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
         body.put("error", "Unauthorized");
         body.put("status", SC_UNAUTHORIZED);
         body.put("message", authException.getMessage());
-        body.put("path", request.getServletPath());
+        body.put("path", request.getRequestURI());
 
         final ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getOutputStream(), body);
