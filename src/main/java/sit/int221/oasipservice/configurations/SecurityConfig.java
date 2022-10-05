@@ -16,6 +16,7 @@ import sit.int221.oasipservice.filters.JwtAuthEntryPoint;
 import sit.int221.oasipservice.filters.JwtRequestFilter;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+import static sit.int221.oasipservice.entities.ERole.ROLE_ADMIN;
 
 @Configuration
 @EnableWebSecurity
@@ -36,7 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(STATELESS).and()
                 .authorizeRequests()
                 .antMatchers("/api/v2/auth/**").permitAll()
-                .antMatchers("/api/v2/users/**").hasAnyAuthority("admin")
+                .antMatchers("/api/v2/users/**").hasAnyAuthority(ROLE_ADMIN.getRole())
                 .anyRequest().authenticated();
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
