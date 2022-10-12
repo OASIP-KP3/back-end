@@ -1,6 +1,6 @@
 package sit.int221.oasipservice.controllers;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
@@ -8,16 +8,20 @@ import sit.int221.oasipservice.dto.categories.fields.CategoryDescDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryDurationDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryNameDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
-import sit.int221.oasipservice.services.EventCategoryServiceV2;
+import sit.int221.oasipservice.services.CategoryService;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
-@RequestMapping("/api/v2/categories")
-public class EventCategoryControllerV2 {
-    private final EventCategoryServiceV2 service;
+@RequestMapping("/api/categories")
+public class CategoryController {
+    private final CategoryService service;
+
+    @Autowired
+    public CategoryController(CategoryService service) {
+        this.service = service;
+    }
 
     @GetMapping("")
     public List<CategoryDto> getCategories() {

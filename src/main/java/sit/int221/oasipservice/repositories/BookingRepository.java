@@ -8,7 +8,7 @@ import sit.int221.oasipservice.entities.EventBooking;
 import java.util.List;
 
 @Repository
-public interface EventBookingRepository extends JpaRepository<EventBooking, Integer> {
+public interface BookingRepository extends JpaRepository<EventBooking, Integer> {
     @Query(value = "SELECT * FROM event_booking " +
             "WHERE date(event_start_time) = ?1 " +
             "AND event_category = ?2 " +

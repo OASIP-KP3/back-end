@@ -1,20 +1,18 @@
-package sit.int221.oasipservice.services;
+package sit.int221.oasipservice.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.oasipservice.dto.events.EventBookingDto;
 import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
-import sit.int221.oasipservice.dto.events.EventListPageDto;
+import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.dto.events.EventPartialUpdateDto;
 import sit.int221.oasipservice.entities.EventBooking;
-import sit.int221.oasipservice.repositories.EventBookingRepository;
+import sit.int221.oasipservice.repositories.BookingRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
 import java.time.LocalDateTime;
@@ -23,35 +21,39 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
+
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class EventBookingServiceV2 {
-    private final EventBookingRepository repo;
+public class BookingServiceImpl {
+    private final BookingRepository repo;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
 
-    public EventListPageDto getEvents(int page, int pageSize, String sortBy) {
-        Sort sort = Sort.by(sortBy).descending();
-        return modelMapper.map(repo.findAll(PageRequest.of(page, pageSize, sort)), EventListPageDto.class);
+    public List<EventListAllDto> getEvents(String sortBy, String type) throws IllegalArgumentException {
+        List<EventBooking> bookings = repo.findAll(Sort.by(sortBy).descending());
+        return switch (type) {
+            case "all" -> listMapper.mapList(bookings, EventListAllDto.class, modelMapper);
+            case "end" -> listMapper.mapList(repo.getPastEvents(), EventListAllDto.class, modelMapper);
+            case "ongoing" -> listMapper.mapList(repo.getFutureEvents(), EventListAllDto.class, modelMapper);
+            default -> throw new IllegalArgumentException("Unknown type: " + type);
+        };
     }
 
-    public EventDetailsBaseDto getEventDetails(Integer id) throws ResourceNotFoundException {
+    public EventDetailsBaseDto getEvent(Integer id) throws ResourceNotFoundException {
         EventBooking booking = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         return modelMapper.map(booking, EventDetailsBaseDto.class);
     }
 
     public void save(EventBookingDto newBooking) throws ResponseStatusException {
-        if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration())) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newBooking.getEventStartTime() + " is overlap");
-        }
+        if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration()))
+            throw new ResponseStatusException(UNPROCESSABLE_ENTITY, newBooking.getEventStartTime() + " is overlap");
         repo.saveAndFlush(modelMapper.map(newBooking, EventBooking.class));
     }
 
     public void delete(Integer id) throws ResourceNotFoundException {
-        if (!repo.existsById(id)) {
-            throw new ResourceNotFoundException("ID " + id + " is not found");
-        }
+        if (!repo.existsById(id)) throw new ResourceNotFoundException("ID " + id + " is not found");
         repo.deleteById(id);
     }
 
@@ -60,26 +62,20 @@ public class EventBookingServiceV2 {
         changes.forEach((field, value) -> {
             switch (field) {
                 case "eventStartTime" -> {
-                    if (value == null) {
-                        throw new IllegalArgumentException(field + " is must not be null");
-                    }
+                    if (value == null) throw new IllegalArgumentException(field + " is must not be null");
                     final String TIME_ZONE = "GMT+07:00";
                     LocalDateTime dateTime = LocalDateTime.parse((String) value);
-                    if (dateTime.isBefore(LocalDateTime.now(ZoneId.of(TIME_ZONE)))) {
+                    if (dateTime.isBefore(LocalDateTime.now(ZoneId.of(TIME_ZONE))))
                         throw new IllegalArgumentException(field + " is must be a date and time in the future");
-                    }
                     Integer duration = repo.getEventDurationById(id);
                     Integer categoryId = repo.getEventCategoryIdById(id);
-                    if (isOverlap(id, categoryId, dateTime, duration)) {
-                        throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, dateTime + " is overlap");
-                    }
+                    if (isOverlap(id, categoryId, dateTime, duration))
+                        throw new ResponseStatusException(UNPROCESSABLE_ENTITY, dateTime + " is overlap");
                     booking.setEventStartTime(LocalDateTime.parse((String) value));
                 }
                 case "eventNotes" -> {
                     String notes = (String) value;
-                    if (notes.length() > 500) {
-                        throw new IllegalArgumentException("size must be between 0 and 500");
-                    }
+                    if (notes.length() > 500) throw new IllegalArgumentException("size must be between 0 and 500");
                     booking.setEventNotes(notes);
                 }
                 default -> throw new IllegalArgumentException("Unknown field: " + field);
@@ -96,7 +92,6 @@ public class EventBookingServiceV2 {
         return checkOverlap(startA, endA, bookings);
     }
 
-
     private boolean isOverlap(Integer categoryId, LocalDateTime dateTime, Integer duration) {
         LocalTime startA = getStartTime(dateTime);
         LocalTime endA = getEndTime(dateTime, duration);
@@ -106,9 +101,7 @@ public class EventBookingServiceV2 {
     }
 
     private boolean checkOverlap(LocalTime startA, LocalTime endA, List<EventBooking> bookings) {
-        if (bookings.isEmpty()) {
-            return false;
-        }
+        if (bookings.isEmpty()) return false;
         for (EventBooking booking : bookings) {
             LocalTime startB = getStartTime(booking.getEventStartTime());
             LocalTime endB = getEndTime(booking.getEventStartTime(), booking.getEventDuration());

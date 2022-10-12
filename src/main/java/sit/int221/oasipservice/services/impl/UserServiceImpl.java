@@ -1,4 +1,4 @@
-package sit.int221.oasipservice.services;
+package sit.int221.oasipservice.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.dto.users.UserDetailsDto;
 import sit.int221.oasipservice.dto.users.UserPageDto;
 import sit.int221.oasipservice.entities.Role;
@@ -22,6 +23,8 @@ import sit.int221.oasipservice.exceptions.UnprocessableException;
 import sit.int221.oasipservice.payload.request.LoginRequest;
 import sit.int221.oasipservice.repositories.RoleRepository;
 import sit.int221.oasipservice.repositories.UserRepository;
+import sit.int221.oasipservice.services.UserService;
+import sit.int221.oasipservice.utils.ListMapper;
 
 import java.util.List;
 import java.util.Locale;
@@ -37,6 +40,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final RoleRepository roleRepo;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
+    private final ListMapper listMapper;
 
     @Override
     public UserPageDto getUsers(int page, int pageSize, String sortBy) {
@@ -57,6 +61,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         log.info("Fetching the details of user id " + id);
         User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         return modelMapper.map(user, UserDetailsDto.class);
+    }
+
+    @Override
+    public List<CategoryDto> getCategoriesByUserId(Integer id) throws ResourceNotFoundException {
+        log.info("Fetching the categories by user id " + id);
+        User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
+        return listMapper.mapList(user.getOwnCategories().stream().toList(), CategoryDto.class, modelMapper);
     }
 
     @Override

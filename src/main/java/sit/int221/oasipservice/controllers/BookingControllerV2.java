@@ -1,39 +1,40 @@
 package sit.int221.oasipservice.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.dto.events.EventBookingDto;
 import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
-import sit.int221.oasipservice.dto.events.EventListPageDto;
+import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.dto.events.EventPartialUpdateDto;
-import sit.int221.oasipservice.services.EventBookingServiceV2;
+import sit.int221.oasipservice.services.impl.BookingServiceImpl;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
+
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/events")
-public class EventBookingControllerV2 {
-    private final EventBookingServiceV2 service;
+public class BookingControllerV2 {
+    private final BookingServiceImpl service;
 
     // default sorting by "eventStartTime" in descending
     @GetMapping("")
-    public EventListPageDto getALlEvents(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "eventStartTime") String sortBy) {
-        return service.getEvents(page, pageSize, sortBy);
+    public List<EventListAllDto> getEvents(
+            @RequestParam(defaultValue = "eventStartTime") String sortBy,
+            @RequestParam(defaultValue = "all") String type) {
+        return service.getEvents(sortBy, type);
     }
 
     @GetMapping("/{id}")
-    public EventDetailsBaseDto getEventDetails(@PathVariable Integer id) {
-        return service.getEventDetails(id);
+    public EventDetailsBaseDto getEvent(@PathVariable Integer id) {
+        return service.getEvent(id);
     }
 
     @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(CREATED)
     public void createEvent(@Valid @RequestBody EventBookingDto newBooking) {
         service.save(newBooking);
     }

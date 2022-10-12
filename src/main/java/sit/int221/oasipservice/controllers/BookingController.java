@@ -8,18 +8,18 @@ import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.dto.events.fields.EventDateTimeDto;
 import sit.int221.oasipservice.dto.events.fields.EventNotesDto;
-import sit.int221.oasipservice.services.EventBookingService;
+import sit.int221.oasipservice.services.BookingService;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/events")
-public class EventBookingController {
-    private final EventBookingService service;
+public class BookingController {
+    private final BookingService service;
 
     @Autowired
-    public EventBookingController(EventBookingService service) {
+    public BookingController(BookingService service) {
         this.service = service;
     }
 

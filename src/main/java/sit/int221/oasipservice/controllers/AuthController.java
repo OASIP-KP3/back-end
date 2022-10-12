@@ -1,7 +1,6 @@
 package sit.int221.oasipservice.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.payload.request.LoginRequest;
@@ -12,6 +11,8 @@ import sit.int221.oasipservice.services.AuthService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(CREATED)
     public void register(@Valid @RequestBody RegisterRequest newUser) {
         service.save(newUser);
     }

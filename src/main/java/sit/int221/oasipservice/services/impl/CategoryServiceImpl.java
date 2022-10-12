@@ -1,9 +1,9 @@
-package sit.int221.oasipservice.services;
+package sit.int221.oasipservice.services.impl;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
@@ -13,33 +13,30 @@ import sit.int221.oasipservice.dto.categories.fields.CategoryNameDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
-import sit.int221.oasipservice.repositories.EventBookingRepository;
-import sit.int221.oasipservice.repositories.EventCategoryRepository;
+import sit.int221.oasipservice.repositories.BookingRepository;
+import sit.int221.oasipservice.repositories.CategoryRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 
 @Service
-public class EventCategoryService {
-    private final EventBookingRepository bookingRepo;
-    private final EventCategoryRepository repo;
+@Log4j2
+@RequiredArgsConstructor
+public class CategoryServiceImpl {
+    private final BookingRepository bookingRepo;
+    private final CategoryRepository repo;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
-
-    @Autowired
-    public EventCategoryService(EventBookingRepository bookingRepo, EventCategoryRepository repo, ModelMapper modelMapper, ListMapper listMapper) {
-        this.bookingRepo = bookingRepo;
-        this.repo = repo;
-        this.modelMapper = modelMapper;
-        this.listMapper = listMapper;
-    }
 
     public List<CategoryDto> getCategories() {
         return listMapper.mapList(repo.findAll(), CategoryDto.class, modelMapper);
     }
 
-    public CategoryDto getCategoryById(Integer id) throws ResourceNotFoundException {
+    public CategoryDto getCategory(Integer id) throws ResourceNotFoundException {
         EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         return modelMapper.map(category, CategoryDto.class);
     }
@@ -71,55 +68,48 @@ public class EventCategoryService {
     }
 
     public void save(CategoryDto newCategory) throws ResponseStatusException {
-        if (!(repo.existsById(newCategory.getId()))) {
-            if (isUnique(newCategory.getCategoryName())) {
-                EventCategory category = modelMapper.map(newCategory, EventCategory.class);
-                repo.saveAndFlush(category);
-            } else {
-                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newCategory.getCategoryName() + " is not unique");
-            }
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newCategory.getId() + " is not unique");
-        }
+        if (repo.existsById(newCategory.getId()))
+            throw new ResponseStatusException(UNPROCESSABLE_ENTITY, newCategory.getId() + " is not unique");
+        if (isUnique(newCategory.getCategoryName()))
+            throw new ResponseStatusException(UNPROCESSABLE_ENTITY, newCategory.getCategoryName() + " is not unique");
+        EventCategory category = modelMapper.map(newCategory, EventCategory.class);
+        repo.saveAndFlush(category);
     }
 
     private boolean isUnique(String categoryName) {
-        return !(repo.getAllCategoryName().contains(categoryName));
+        return repo.getAllCategoryName().contains(categoryName);
     }
 
     public void delete(Integer id) throws ResourceNotFoundException {
-        if (!repo.existsById(id)) {
-            throw new ResourceNotFoundException("ID " + id + " is not found");
-        }
+        if (!repo.existsById(id)) throw new ResourceNotFoundException("ID " + id + " is not found");
         repo.deleteById(id);
     }
 
+    public void update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException, ResponseStatusException {
+        EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
+    }
+
     public CategoryNameDto updateCategoryName(Integer id, CategoryNameDto categoryName) throws ResourceNotFoundException, ResponseStatusException {
-        EventCategory newCategory = modelMapper.map(categoryName, EventCategory.class);
         EventCategory updatedCategory = repo.findById(id).map((oldCategory) -> {
-            if (isUnique(newCategory.getCategoryName())) {
-                oldCategory.setCategoryName(newCategory.getCategoryName());
-                return oldCategory;
-            } else {
-                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newCategory.getCategoryName() + " is not unique");
-            }
+            if (isUnique(categoryName.getCategoryName()))
+                throw new ResponseStatusException(UNPROCESSABLE_ENTITY, categoryName.getCategoryName() + " is not unique");
+            oldCategory.setCategoryName(categoryName.getCategoryName());
+            return oldCategory;
         }).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         return modelMapper.map(repo.saveAndFlush(updatedCategory), CategoryNameDto.class);
     }
 
     public CategoryDescDto updateCategoryDesc(Integer id, CategoryDescDto description) throws ResourceNotFoundException {
-        EventCategory newCategory = modelMapper.map(description, EventCategory.class);
         EventCategory updatedCategory = repo.findById(id).map((oldCategory) -> {
-            oldCategory.setCategoryDescription(newCategory.getCategoryDescription());
+            oldCategory.setCategoryDescription(description.getCategoryDescription());
             return oldCategory;
         }).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         return modelMapper.map(repo.saveAndFlush(updatedCategory), CategoryDescDto.class);
     }
 
     public CategoryDurationDto updateDuration(Integer id, CategoryDurationDto duration) throws ResourceNotFoundException {
-        EventCategory newCategory = modelMapper.map(duration, EventCategory.class);
         EventCategory updatedCategory = repo.findById(id).map((oldCategory) -> {
-            oldCategory.setEventDuration(newCategory.getEventDuration());
+            oldCategory.setEventDuration(duration.getEventDuration());
             return oldCategory;
         }).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         return modelMapper.map(repo.saveAndFlush(updatedCategory), CategoryDurationDto.class);

@@ -5,7 +5,9 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -32,4 +34,7 @@ public class EventCategory {
 
     @OneToMany(mappedBy = "eventCategory")
     private List<EventBooking> eventBookings = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "ownCategories")
+    private Set<User> owners = new LinkedHashSet<>();
 }

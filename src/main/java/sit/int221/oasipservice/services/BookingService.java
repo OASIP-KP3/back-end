@@ -13,7 +13,7 @@ import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.dto.events.fields.EventDateTimeDto;
 import sit.int221.oasipservice.dto.events.fields.EventNotesDto;
 import sit.int221.oasipservice.entities.EventBooking;
-import sit.int221.oasipservice.repositories.EventBookingRepository;
+import sit.int221.oasipservice.repositories.BookingRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
 import java.time.LocalDateTime;
@@ -21,13 +21,13 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Service
-public class EventBookingService {
-    private final EventBookingRepository repo;
+public class BookingService {
+    private final BookingRepository repo;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
 
     @Autowired
-    public EventBookingService(EventBookingRepository repo, ModelMapper modelMapper, ListMapper listMapper) {
+    public BookingService(BookingRepository repo, ModelMapper modelMapper, ListMapper listMapper) {
         this.repo = repo;
         this.modelMapper = modelMapper;
         this.listMapper = listMapper;

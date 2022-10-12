@@ -1,8 +1,7 @@
 package sit.int221.oasipservice.services;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,22 +13,27 @@ import sit.int221.oasipservice.dto.categories.fields.CategoryNameDto;
 import sit.int221.oasipservice.dto.events.EventListAllDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
-import sit.int221.oasipservice.repositories.EventBookingRepository;
-import sit.int221.oasipservice.repositories.EventCategoryRepository;
+import sit.int221.oasipservice.repositories.BookingRepository;
+import sit.int221.oasipservice.repositories.CategoryRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 @Service
-@Log4j2
-@RequiredArgsConstructor
-public class EventCategoryServiceV2 {
-    private final EventBookingRepository bookingRepo;
-    private final EventCategoryRepository repo;
+public class CategoryService {
+    private final BookingRepository bookingRepo;
+    private final CategoryRepository repo;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
+
+    @Autowired
+    public CategoryService(BookingRepository bookingRepo, CategoryRepository repo, ModelMapper modelMapper, ListMapper listMapper) {
+        this.bookingRepo = bookingRepo;
+        this.repo = repo;
+        this.modelMapper = modelMapper;
+        this.listMapper = listMapper;
+    }
 
     public List<CategoryDto> getCategories() {
         return listMapper.mapList(repo.findAll(), CategoryDto.class, modelMapper);
@@ -88,10 +92,6 @@ public class EventCategoryServiceV2 {
             throw new ResourceNotFoundException("ID " + id + " is not found");
         }
         repo.deleteById(id);
-    }
-
-    public void update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException, ResponseStatusException {
-        EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
     }
 
     public CategoryNameDto updateCategoryName(Integer id, CategoryNameDto categoryName) throws ResourceNotFoundException, ResponseStatusException {

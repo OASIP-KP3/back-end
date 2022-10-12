@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
@@ -40,7 +41,7 @@ public class User {
     private OffsetDateTime createdOn;
 
     @UpdateTimestamp
-    @Column(name = "updatedOn", nullable = false, insertable = false, updatable = false)
+    @Column(name = "updatedOn", nullable = false, insertable = false)
     private OffsetDateTime updatedOn;
 
     @ManyToMany
@@ -49,6 +50,29 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> userRoles = new LinkedHashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "event_category_owner",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<EventCategory> ownCategories = new LinkedHashSet<>();
+
+    public void addCategory(EventCategory category) {
+        this.ownCategories.add(category);
+        category.getOwners().add(this);
+    }
+
+    public void removeCategory(Integer categoryId) {
+        EventCategory category = this.ownCategories
+                .stream()
+                .filter(c -> Objects.equals(c.getId(), categoryId))
+                .findFirst().orElse(null);
+        if (category != null) {
+            this.ownCategories.remove(category);
+            category.getOwners().remove(this);
+        }
+    }
 
     public void addRole(Role role) {
         this.userRoles.add(role);
