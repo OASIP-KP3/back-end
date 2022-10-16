@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Component
-public class JwtUtil {
+public class JwtUtils {
     private final String ROLES = "roles";
     private String secretKey;
     private int jwtExpirationInMs;
@@ -58,7 +58,7 @@ public class JwtUtil {
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
-        return createRefreshToken(userDetails.getUsername(), userDetails.getAuthorities());
+        return createRefreshToken(userDetails.getUsername());
     }
 
     private String createAccessToken(String subject, Collection<? extends GrantedAuthority> authorities) {
@@ -70,7 +70,7 @@ public class JwtUtil {
                 .sign(Algorithm.HMAC256(secretKey));
     }
 
-    private String createRefreshToken(String subject, Collection<? extends GrantedAuthority> authorities) {
+    private String createRefreshToken(String subject) {
         return JWT.create()
                 .withSubject(subject)
                 .withIssuedAt(new Date(System.currentTimeMillis()))

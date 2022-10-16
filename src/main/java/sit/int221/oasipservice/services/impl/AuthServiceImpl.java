@@ -19,7 +19,7 @@ import sit.int221.oasipservice.payload.response.JwtResponse;
 import sit.int221.oasipservice.repositories.RoleRepository;
 import sit.int221.oasipservice.repositories.UserRepository;
 import sit.int221.oasipservice.services.AuthService;
-import sit.int221.oasipservice.utils.JwtUtil;
+import sit.int221.oasipservice.utils.JwtUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
     private final UserDetailsService userService;
-    private final JwtUtil jwtUtil;
+    private final JwtUtils jwtUtils;
 
     @Override
     public JwtResponse login(LoginRequest request) throws ResourceNotFoundException, UnauthorizedException {
@@ -52,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
         }
         authManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         log.info("Attempting to authenticate with " + email);
-        return jwtUtil.generateToken(userService.loadUserByUsername(email));
+        return jwtUtils.generateToken(userService.loadUserByUsername(email));
     }
 
     @Override
@@ -61,25 +61,25 @@ public class AuthServiceImpl implements AuthService {
             TokenExpiredException,
             JWTDecodeException,
             ServletRequestBindingException {
-        if (!jwtUtil.isHeaderValid(request)) {
+        if (!jwtUtils.isHeaderValid(request)) {
             String errorMessage = "Invalid header value or missing authorization header";
             log.error(errorMessage);
             response.setHeader("Error", errorMessage);
             throw new ServletRequestBindingException(errorMessage);
         }
-        String refreshToken = jwtUtil.getToken(request);
-        String email = jwtUtil.getEmail(refreshToken);
+        String refreshToken = jwtUtils.getToken(request);
+        String email = jwtUtils.getEmail(refreshToken);
         if (refreshToken == null || email == null) {
             String errorMessage = "Invalid refresh token";
             log.error(errorMessage);
             response.setHeader("Error", errorMessage);
             throw new JWTDecodeException(errorMessage);
         }
-        if (jwtUtil.isTokenExpired(refreshToken)) {
+        if (jwtUtils.isTokenExpired(refreshToken)) {
             String errorMessage = "The Token has expired on ";
-            log.error(errorMessage + jwtUtil.getExpiresAt(refreshToken).toString());
+            log.error(errorMessage + jwtUtils.getExpiresAt(refreshToken).toString());
             response.setHeader("Error", errorMessage);
-            throw new TokenExpiredException(errorMessage, jwtUtil.getExpiresAt(refreshToken));
+            throw new TokenExpiredException(errorMessage, jwtUtils.getExpiresAt(refreshToken));
         }
         User user = userRepo.findByUserEmail(email);
         if (user == null) {
@@ -89,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
             throw new ResourceNotFoundException(errorMessage);
         }
         String tokenType = "Bearer";
-        String accessToken = jwtUtil.generateAccessToken(userService.loadUserByUsername(email));
+        String accessToken = jwtUtils.generateAccessToken(userService.loadUserByUsername(email));
         log.info("Renewing access token for user id " + user.getId());
         return new JwtResponse(accessToken, refreshToken, tokenType);
     }
