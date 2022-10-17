@@ -10,11 +10,9 @@ import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
 import sit.int221.oasipservice.exceptions.UnprocessableException;
-import sit.int221.oasipservice.repositories.BookingRepository;
 import sit.int221.oasipservice.repositories.CategoryRepository;
 import sit.int221.oasipservice.utils.ListMapper;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +20,6 @@ import java.util.Map;
 @Log4j2
 @RequiredArgsConstructor
 public class CategoryServiceImpl {
-    private final BookingRepository bookingRepo;
     private final CategoryRepository repo;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
@@ -39,30 +36,11 @@ public class CategoryServiceImpl {
         return modelMapper.map(category, CategoryDto.class);
     }
 
-    public List<BookingViewDto> getEventsBy(Integer id, String date, String type) throws ResourceNotFoundException {
+    public List<BookingViewDto> getEventsByCategoryId(Integer id) throws ResourceNotFoundException {
+        log.info("Fetching all bookings from category id: " + id);
         EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        if (date != null && type == null) {
-            List<EventBooking> bookings = bookingRepo.findAllByDateAndCategory(date, id);
-            return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
-        } else if (date == null && type != null) {
-            switch (type) {
-                case "future" -> {
-                    List<EventBooking> futureEvents = bookingRepo.getFutureEventsByDateAndCategory(id);
-                    return listMapper.mapList(futureEvents, BookingViewDto.class, modelMapper);
-                }
-                case "past" -> {
-                    List<EventBooking> pastEvents = bookingRepo.getPastEventsByDateAndCategory(id);
-                    return listMapper.mapList(pastEvents, BookingViewDto.class, modelMapper);
-                }
-                case "all" -> {
-                    category.getEventBookings().sort(Comparator.comparing(EventBooking::getEventStartTime).reversed());
-                    return listMapper.mapList(category.getEventBookings(), BookingViewDto.class, modelMapper);
-                }
-                default -> throw new ResourceNotFoundException("Type " + type + " is not supported");
-            }
-        }
-        category.getEventBookings().sort(Comparator.comparing(EventBooking::getEventStartTime).reversed());
-        return listMapper.mapList(category.getEventBookings(), BookingViewDto.class, modelMapper);
+        List<EventBooking> bookings = category.getEventBookings();
+        return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
     }
 
     public void save(CategoryDto newCategory) throws UnprocessableException {

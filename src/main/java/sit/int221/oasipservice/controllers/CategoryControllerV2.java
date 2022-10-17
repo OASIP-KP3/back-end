@@ -29,11 +29,8 @@ public class CategoryControllerV2 {
     }
 
     @GetMapping("/{id}/events")
-    public List<BookingViewDto> getEventsByCategoryId(
-            @PathVariable Integer id,
-            @RequestParam(name = "date", required = false) String date,
-            @RequestParam(name = "type", required = false) String type) {
-        return service.getEventsBy(id, date, type);
+    public List<BookingViewDto> getEventsByCategoryId(@PathVariable Integer id) {
+        return service.getEventsByCategoryId(id);
     }
 
     @PostMapping("")
