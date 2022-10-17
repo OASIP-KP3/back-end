@@ -1,4 +1,4 @@
-package sit.int221.oasipservice.dto.events;
+package sit.int221.oasipservice.dto.bookings;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class EventBookingDto {
+public class BookingDto {
     private Integer id;
 
     @NotNull
@@ -42,17 +42,17 @@ public class EventBookingDto {
     @Size(max = 500)
     private String eventNotes;
 
-    public EventBookingDto setBookingName(String bookingName) {
+    public BookingDto setBookingName(String bookingName) {
         this.bookingName = bookingName.trim();
         return this;
     }
 
-    public EventBookingDto setBookingEmail(String bookingEmail) {
+    public BookingDto setBookingEmail(String bookingEmail) {
         this.bookingEmail = bookingEmail.toLowerCase();
         return this;
     }
 
-    public EventBookingDto setEventNotes(String eventNotes) {
+    public BookingDto setEventNotes(String eventNotes) {
         this.eventNotes = eventNotes == null || eventNotes.isBlank() ? null : eventNotes.trim();
         return this;
     }

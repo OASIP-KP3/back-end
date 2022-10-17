@@ -7,7 +7,7 @@ import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryDescDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryDurationDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryNameDto;
-import sit.int221.oasipservice.dto.events.EventListAllDto;
+import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.services.impl.CategoryServiceImpl;
 
 import javax.validation.Valid;
@@ -30,7 +30,7 @@ public class CategoryControllerV2 {
     }
 
     @GetMapping("/{id}/events")
-    public List<EventListAllDto> getEventsByCategoryId(
+    public List<BookingViewDto> getEventsByCategoryId(
             @PathVariable Integer id,
             @RequestParam(name = "date", required = false) String date,
             @RequestParam(name = "type", required = false) String type) {

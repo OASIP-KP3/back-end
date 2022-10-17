@@ -2,10 +2,10 @@ package sit.int221.oasipservice.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import sit.int221.oasipservice.dto.events.EventBookingDto;
-import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
-import sit.int221.oasipservice.dto.events.EventListAllDto;
-import sit.int221.oasipservice.dto.events.EventPartialUpdateDto;
+import sit.int221.oasipservice.dto.bookings.BookingDto;
+import sit.int221.oasipservice.dto.bookings.BookingDetailsDto;
+import sit.int221.oasipservice.dto.bookings.BookingViewDto;
+import sit.int221.oasipservice.dto.bookings.EventPartialUpdateDto;
 import sit.int221.oasipservice.services.impl.BookingServiceImpl;
 
 import javax.validation.Valid;
@@ -22,20 +22,20 @@ public class BookingControllerV2 {
 
     // default sorting by "eventStartTime" in descending
     @GetMapping("")
-    public List<EventListAllDto> getEvents(
+    public List<BookingViewDto> getEvents(
             @RequestParam(defaultValue = "eventStartTime") String sortBy,
             @RequestParam(defaultValue = "all") String type) {
         return service.getEvents(sortBy, type);
     }
 
     @GetMapping("/{id}")
-    public EventDetailsBaseDto getEvent(@PathVariable Integer id) {
+    public BookingDetailsDto getEvent(@PathVariable Integer id) {
         return service.getEvent(id);
     }
 
     @PostMapping("")
     @ResponseStatus(CREATED)
-    public void createEvent(@Valid @RequestBody EventBookingDto newBooking) {
+    public void createEvent(@Valid @RequestBody BookingDto newBooking) {
         service.save(newBooking);
     }
 

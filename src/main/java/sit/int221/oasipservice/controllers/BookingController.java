@@ -3,11 +3,11 @@ package sit.int221.oasipservice.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import sit.int221.oasipservice.dto.events.EventBookingDto;
-import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
-import sit.int221.oasipservice.dto.events.EventListAllDto;
-import sit.int221.oasipservice.dto.events.fields.EventDateTimeDto;
-import sit.int221.oasipservice.dto.events.fields.EventNotesDto;
+import sit.int221.oasipservice.dto.bookings.BookingDto;
+import sit.int221.oasipservice.dto.bookings.BookingDetailsDto;
+import sit.int221.oasipservice.dto.bookings.BookingViewDto;
+import sit.int221.oasipservice.dto.bookings.fields.EventDateTimeDto;
+import sit.int221.oasipservice.dto.bookings.fields.EventNotesDto;
 import sit.int221.oasipservice.services.BookingService;
 
 import javax.validation.Valid;
@@ -24,18 +24,18 @@ public class BookingController {
     }
 
     @GetMapping("")
-    public List<EventListAllDto> getEventListSorted() {
+    public List<BookingViewDto> getEventListSorted() {
         return service.getEventListSorted();
     }
 
     @GetMapping("/{id}")
-    public EventDetailsBaseDto getEventDetails(@PathVariable Integer id) {
+    public BookingDetailsDto getEventDetails(@PathVariable Integer id) {
         return service.getEventDetails(id);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createEvent(@Valid @RequestBody EventBookingDto newBooking) {
+    public void createEvent(@Valid @RequestBody BookingDto newBooking) {
         service.save(newBooking);
     }
 
@@ -55,12 +55,12 @@ public class BookingController {
     }
 
     @GetMapping("/types")
-    public List<EventListAllDto> getEventsBy(@RequestParam(defaultValue = "future") String type) {
+    public List<BookingViewDto> getEventsBy(@RequestParam(defaultValue = "future") String type) {
         return service.getEventsBy(type);
     }
 
     @GetMapping("/dates/{date}")
-    public List<EventListAllDto> getEventsByDate(@PathVariable String date) {
+    public List<BookingViewDto> getEventsByDate(@PathVariable String date) {
         return service.getEventsByDate(date);
     }
 }

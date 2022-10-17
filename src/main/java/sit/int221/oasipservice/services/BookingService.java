@@ -7,11 +7,11 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import sit.int221.oasipservice.dto.events.EventBookingDto;
-import sit.int221.oasipservice.dto.events.EventDetailsBaseDto;
-import sit.int221.oasipservice.dto.events.EventListAllDto;
-import sit.int221.oasipservice.dto.events.fields.EventDateTimeDto;
-import sit.int221.oasipservice.dto.events.fields.EventNotesDto;
+import sit.int221.oasipservice.dto.bookings.BookingDto;
+import sit.int221.oasipservice.dto.bookings.BookingDetailsDto;
+import sit.int221.oasipservice.dto.bookings.BookingViewDto;
+import sit.int221.oasipservice.dto.bookings.fields.EventDateTimeDto;
+import sit.int221.oasipservice.dto.bookings.fields.EventNotesDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.repositories.BookingRepository;
 import sit.int221.oasipservice.utils.ListMapper;
@@ -33,18 +33,18 @@ public class BookingService {
         this.listMapper = listMapper;
     }
 
-    public List<EventListAllDto> getEventListSorted() {
+    public List<BookingViewDto> getEventListSorted() {
         Sort sort = Sort.by("eventStartTime");
         List<EventBooking> bookings = repo.findAll(sort.descending());
-        return listMapper.mapList(bookings, EventListAllDto.class, modelMapper);
+        return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
     }
 
-    public EventDetailsBaseDto getEventDetails(Integer id) throws ResourceNotFoundException {
+    public BookingDetailsDto getEventDetails(Integer id) throws ResourceNotFoundException {
         EventBooking booking = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        return modelMapper.map(booking, EventDetailsBaseDto.class);
+        return modelMapper.map(booking, BookingDetailsDto.class);
     }
 
-    public void save(EventBookingDto newBooking) throws ResponseStatusException {
+    public void save(BookingDto newBooking) throws ResponseStatusException {
         if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration())) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, newBooking.getEventStartTime() + " is overlap");
         } else {
@@ -84,7 +84,7 @@ public class BookingService {
         repo.deleteById(id);
     }
 
-    public List<EventListAllDto> getEventsBy(String type) throws ResourceNotFoundException {
+    public List<BookingViewDto> getEventsBy(String type) throws ResourceNotFoundException {
         return switch (type) {
             case "future" -> getFutureEvents();
             case "past" -> getPastEvents();
@@ -93,19 +93,19 @@ public class BookingService {
         };
     }
 
-    private List<EventListAllDto> getFutureEvents() {
+    private List<BookingViewDto> getFutureEvents() {
         List<EventBooking> bookings = repo.getFutureEvents();
-        return listMapper.mapList(bookings, EventListAllDto.class, modelMapper);
+        return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
     }
 
-    private List<EventListAllDto> getPastEvents() {
+    private List<BookingViewDto> getPastEvents() {
         List<EventBooking> bookings = repo.getPastEvents();
-        return listMapper.mapList(bookings, EventListAllDto.class, modelMapper);
+        return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
     }
 
-    public List<EventListAllDto> getEventsByDate(String date) {
+    public List<BookingViewDto> getEventsByDate(String date) {
         List<EventBooking> bookings = repo.findAllByByDate(date);
-        return listMapper.mapList(bookings, EventListAllDto.class, modelMapper);
+        return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
     }
 
     private boolean isOverlap(Integer id, Integer categoryId, LocalDateTime dateTime, Integer duration) {

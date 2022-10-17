@@ -10,7 +10,7 @@ import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryDescDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryDurationDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryNameDto;
-import sit.int221.oasipservice.dto.events.EventListAllDto;
+import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
 import sit.int221.oasipservice.repositories.BookingRepository;
@@ -44,30 +44,30 @@ public class CategoryService {
         return modelMapper.map(category, CategoryDto.class);
     }
 
-    public List<EventListAllDto> getEventsBy(Integer id, String date, String type) throws ResourceNotFoundException {
+    public List<BookingViewDto> getEventsBy(Integer id, String date, String type) throws ResourceNotFoundException {
         EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         if (date != null && type == null) {
             List<EventBooking> bookings = bookingRepo.findAllByDateAndCategory(date, id);
-            return listMapper.mapList(bookings, EventListAllDto.class, modelMapper);
+            return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
         } else if (date == null && type != null) {
             switch (type) {
                 case "future" -> {
                     List<EventBooking> futureEvents = bookingRepo.getFutureEventsByDateAndCategory(id);
-                    return listMapper.mapList(futureEvents, EventListAllDto.class, modelMapper);
+                    return listMapper.mapList(futureEvents, BookingViewDto.class, modelMapper);
                 }
                 case "past" -> {
                     List<EventBooking> pastEvents = bookingRepo.getPastEventsByDateAndCategory(id);
-                    return listMapper.mapList(pastEvents, EventListAllDto.class, modelMapper);
+                    return listMapper.mapList(pastEvents, BookingViewDto.class, modelMapper);
                 }
                 case "all" -> {
                     category.getEventBookings().sort(Comparator.comparing(EventBooking::getEventStartTime).reversed());
-                    return listMapper.mapList(category.getEventBookings(), EventListAllDto.class, modelMapper);
+                    return listMapper.mapList(category.getEventBookings(), BookingViewDto.class, modelMapper);
                 }
                 default -> throw new ResourceNotFoundException("Type " + type + " is not supported");
             }
         }
         category.getEventBookings().sort(Comparator.comparing(EventBooking::getEventStartTime).reversed());
-        return listMapper.mapList(category.getEventBookings(), EventListAllDto.class, modelMapper);
+        return listMapper.mapList(category.getEventBookings(), BookingViewDto.class, modelMapper);
     }
 
     public void save(CategoryDto newCategory) throws ResponseStatusException {

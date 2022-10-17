@@ -1,4 +1,4 @@
-package sit.int221.oasipservice.dto.events;
+package sit.int221.oasipservice.dto.bookings;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class EventDetailsBaseDto {
+public class BookingDetailsDto {
     private Integer id;
     private String bookingName;
     private String bookingEmail;

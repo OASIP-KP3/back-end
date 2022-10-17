@@ -1,12 +1,10 @@
-package sit.int221.oasipservice.dto.events.fields;
+package sit.int221.oasipservice.dto.bookings;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sit.int221.oasipservice.annotations.FutureValidation;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -14,12 +12,15 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class EventDateTimeDto {
+public class EventPartialUpdateDto {
     private Integer id;
-
-    @NotNull
-    @FutureValidation
     private LocalDateTime eventStartTime;
+    private String eventNotes;
+
+    public EventPartialUpdateDto setEventNotes(String eventNotes) {
+        this.eventNotes = eventNotes == null || eventNotes.isBlank() ? null : eventNotes.trim();
+        return this;
+    }
 
     public String getEventNewDate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
