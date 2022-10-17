@@ -19,6 +19,7 @@ public class BookingDto {
     @NotNull
     @NotEmpty
     @Size(min = 1, max = 100)
+    @Pattern(regexp = "^[^\s].+[^\s]$", message = "leading or trailing white spaces do not allowed in the string")
     private String bookingName;
 
     @NotNull
@@ -41,11 +42,6 @@ public class BookingDto {
 
     @Size(max = 500)
     private String eventNotes;
-
-    public BookingDto setBookingName(String bookingName) {
-        this.bookingName = bookingName.trim();
-        return this;
-    }
 
     public BookingDto setBookingEmail(String bookingEmail) {
         this.bookingEmail = bookingEmail.toLowerCase();

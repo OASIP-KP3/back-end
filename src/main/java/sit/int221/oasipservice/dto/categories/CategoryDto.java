@@ -19,6 +19,7 @@ public class CategoryDto {
     @NotNull
     @NotEmpty
     @Size(min = 1, max = 100)
+    @Pattern(regexp = "^[^\s].+[^\s]$", message = "leading or trailing white spaces do not allowed in the string")
     private String categoryName;
 
     @Size(max = 500)
@@ -28,11 +29,6 @@ public class CategoryDto {
     @Min(1)
     @Max(480)
     private Integer eventDuration;
-
-    public CategoryDto setCategoryName(String categoryName) {
-        this.categoryName = categoryName.trim();
-        return this;
-    }
 
     public CategoryDto setCategoryDescription(String categoryDescription) {
         this.categoryDescription = categoryDescription == null || categoryDescription.isBlank() ? null : categoryDescription.trim();
