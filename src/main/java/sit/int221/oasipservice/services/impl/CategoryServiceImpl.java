@@ -12,6 +12,7 @@ import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
 import sit.int221.oasipservice.exceptions.UnprocessableException;
 import sit.int221.oasipservice.repositories.CategoryRepository;
+import sit.int221.oasipservice.services.CategoryService;
 import sit.int221.oasipservice.utils.ListMapper;
 
 import java.util.List;
@@ -20,23 +21,26 @@ import java.util.Map;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class CategoryServiceImpl {
+public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository repo;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
 
+    @Override
     public List<CategoryDto> getCategories() {
         log.info("Fetching all categories...");
         List<EventCategory> categories = repo.findAll();
         return listMapper.mapList(categories, CategoryDto.class, modelMapper);
     }
 
+    @Override
     public CategoryDto getCategory(Integer id) throws ResourceNotFoundException {
         log.info("Fetching category id: " + id);
         EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         return modelMapper.map(category, CategoryDto.class);
     }
 
+    @Override
     public List<BookingViewDto> getEventsByCategoryId(Integer id) throws ResourceNotFoundException {
         log.info("Fetching all bookings from category id: " + id);
         EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
@@ -44,6 +48,7 @@ public class CategoryServiceImpl {
         return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
     }
 
+    @Override
     public void save(@NotNull CategoryDto newCategory) throws UnprocessableException {
         log.info("Saving a new category...");
         if (repo.existsById(newCategory.getId()))
@@ -57,12 +62,14 @@ public class CategoryServiceImpl {
         return repo.getAllCategoryName().contains(categoryName);
     }
 
+    @Override
     public void delete(Integer id) throws ResourceNotFoundException {
         log.info("Deleting category id: " + id);
         if (!repo.existsById(id)) throw new ResourceNotFoundException("ID " + id + " is not found");
         repo.deleteById(id);
     }
 
+    @Override
     public CategoryDto update(Integer id, @NotNull Map<String, Object> changes) throws IllegalArgumentException, ResourceNotFoundException, UnprocessableException {
         EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         changes.forEach((field, value) -> {
@@ -86,9 +93,9 @@ public class CategoryServiceImpl {
                     category.setCategoryDescription(description);
                 }
                 case "eventDuration" -> {
-                    Integer duration = (Integer) value;
-                    if (duration == null)
+                    if (value == null)
                         throw new IllegalArgumentException(field + " is must not be null");
+                    Integer duration = (Integer) value;
                     if (duration < 1 || duration > 480)
                         throw new IllegalArgumentException("duration must be between 1 and 480");
                     log.info("Updating category duration of id: " + id);
