@@ -2,6 +2,7 @@ package sit.int221.oasipservice.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class CategoryServiceImpl {
         return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
     }
 
-    public void save(CategoryDto newCategory) throws UnprocessableException {
+    public void save(@NotNull CategoryDto newCategory) throws UnprocessableException {
         log.info("Saving a new category...");
         if (repo.existsById(newCategory.getId()))
             throw new UnprocessableException(newCategory.getId() + " is not unique");
@@ -62,7 +63,7 @@ public class CategoryServiceImpl {
         repo.deleteById(id);
     }
 
-    public CategoryDto update(Integer id, Map<String, Object> changes) throws IllegalArgumentException, ResourceNotFoundException, UnprocessableException {
+    public CategoryDto update(Integer id, @NotNull Map<String, Object> changes) throws IllegalArgumentException, ResourceNotFoundException, UnprocessableException {
         EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         changes.forEach((field, value) -> {
             switch (field) {

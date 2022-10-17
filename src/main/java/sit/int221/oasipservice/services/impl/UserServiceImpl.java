@@ -2,6 +2,7 @@ package sit.int221.oasipservice.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -66,7 +67,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetailsDto update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException, UnprocessableException, IllegalArgumentException {
+    public UserDetailsDto update(Integer id, @NotNull Map<String, Object> changes) throws ResourceNotFoundException, UnprocessableException, IllegalArgumentException {
         User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         changes.forEach((field, value) -> {
             switch (field) {
@@ -116,7 +117,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<String> matchPassword(LoginRequest request) throws ResourceNotFoundException, UnauthorizedException {
+    public ResponseEntity<String> matchPassword(@NotNull LoginRequest request) throws ResourceNotFoundException, UnauthorizedException {
         String email = request.getUserEmail();
         String password = request.getUserPassword();
         User user = userRepo.findByUserEmail(email);

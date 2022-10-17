@@ -4,6 +4,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtils jwtUtils;
 
     @Override
-    public JwtResponse login(LoginRequest request) throws ResourceNotFoundException, UnauthorizedException {
+    public JwtResponse login(@NotNull LoginRequest request) throws ResourceNotFoundException, UnauthorizedException {
         String email = request.getUserEmail();
         String password = request.getUserPassword();
         User user = userRepo.findByUserEmail(email);
@@ -95,7 +96,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void save(RegisterRequest newUser) {
+    public void save(@NotNull RegisterRequest newUser) {
         log.info("Saving a new user to the database...");
         userRepo.saveAndFlush(populateUser(newUser));
     }

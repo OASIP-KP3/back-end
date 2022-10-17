@@ -2,6 +2,7 @@ package sit.int221.oasipservice.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -49,7 +50,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public void save(BookingDto newBooking) throws UnprocessableException {
+    public void save(@NotNull BookingDto newBooking) throws UnprocessableException {
         log.info("Saving a new booking...");
         if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration()))
             throw new UnprocessableException(newBooking.getEventStartTime() + " is overlap");
@@ -64,7 +65,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDetailsDto update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException, UnprocessableException, IllegalArgumentException {
+    public BookingDetailsDto update(Integer id, @NotNull Map<String, Object> changes) throws ResourceNotFoundException, UnprocessableException, IllegalArgumentException {
         EventBooking booking = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         changes.forEach((field, value) -> {
             switch (field) {
