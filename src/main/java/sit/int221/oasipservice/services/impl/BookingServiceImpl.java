@@ -6,11 +6,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import sit.int221.oasipservice.dto.bookings.BookingDetailsDto;
 import sit.int221.oasipservice.dto.bookings.BookingDto;
 import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.entities.EventBooking;
+import sit.int221.oasipservice.exceptions.UnprocessableException;
 import sit.int221.oasipservice.repositories.BookingRepository;
 import sit.int221.oasipservice.services.BookingService;
 import sit.int221.oasipservice.utils.ListMapper;
@@ -20,8 +20,6 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
-
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 
 @Service
 @Log4j2
@@ -51,10 +49,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public void save(BookingDto newBooking) throws ResponseStatusException {
+    public void save(BookingDto newBooking) throws UnprocessableException {
         log.info("Saving a new booking...");
         if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration()))
-            throw new ResponseStatusException(UNPROCESSABLE_ENTITY, newBooking.getEventStartTime() + " is overlap");
+            throw new UnprocessableException(newBooking.getEventStartTime() + " is overlap");
         repo.saveAndFlush(modelMapper.map(newBooking, EventBooking.class));
     }
 
@@ -66,7 +64,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDetailsDto update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException, ResponseStatusException, IllegalArgumentException {
+    public BookingDetailsDto update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException, UnprocessableException, IllegalArgumentException {
         EventBooking booking = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         changes.forEach((field, value) -> {
             switch (field) {
@@ -79,7 +77,7 @@ public class BookingServiceImpl implements BookingService {
                     Integer duration = repo.getEventDurationById(id);
                     Integer categoryId = repo.getEventCategoryIdById(id);
                     if (isOverlap(id, categoryId, dateTime, duration))
-                        throw new ResponseStatusException(UNPROCESSABLE_ENTITY, dateTime + " is overlap");
+                        throw new UnprocessableException(dateTime + " is overlap");
                     log.info("Updating start time of id: " + id);
                     booking.setEventStartTime(LocalDateTime.parse((String) value));
                 }

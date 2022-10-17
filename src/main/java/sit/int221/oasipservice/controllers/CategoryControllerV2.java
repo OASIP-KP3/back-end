@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
-import sit.int221.oasipservice.dto.categories.fields.CategoryDescDto;
-import sit.int221.oasipservice.dto.categories.fields.CategoryDurationDto;
-import sit.int221.oasipservice.dto.categories.fields.CategoryNameDto;
 import sit.int221.oasipservice.services.impl.CategoryServiceImpl;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -49,18 +47,8 @@ public class CategoryControllerV2 {
         service.delete(id);
     }
 
-    @PatchMapping("/{id}/names")
-    public CategoryNameDto updateCategoryName(@PathVariable Integer id, @Valid @RequestBody CategoryNameDto categoryName) {
-        return service.updateCategoryName(id, categoryName);
-    }
-
-    @PatchMapping("/{id}/descriptions")
-    public CategoryDescDto updateCategoryDesc(@PathVariable Integer id, @Valid @RequestBody CategoryDescDto description) {
-        return service.updateCategoryDesc(id, description);
-    }
-
-    @PatchMapping("/{id}/durations")
-    public CategoryDurationDto updateDuration(@PathVariable Integer id, @Valid @RequestBody CategoryDurationDto duration) {
-        return service.updateDuration(id, duration);
+    @PatchMapping("/{id}")
+    public CategoryDto updateCategoryName(@PathVariable Integer id, @RequestBody Map<String, Object> body) {
+        return service.update(id, body);
     }
 }

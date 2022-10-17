@@ -74,6 +74,8 @@ public class UserServiceImpl implements UserService {
                     String username = (String) value;
                     if (username == null || username.isBlank())
                         throw new IllegalArgumentException(field + " is must not be null or empty");
+                    if (username.length() > 100 || username.length() < 1)
+                        throw new IllegalArgumentException("size must be between 1 and 100");
                     if (!isUsernameUnique(user.getUserName(), username))
                         throw new UnprocessableException("Username " + username + " is not unique");
                     log.info("Updating the username id " + id);

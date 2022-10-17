@@ -5,14 +5,11 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
-import sit.int221.oasipservice.dto.categories.fields.CategoryDescDto;
-import sit.int221.oasipservice.dto.categories.fields.CategoryDurationDto;
-import sit.int221.oasipservice.dto.categories.fields.CategoryNameDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
+import sit.int221.oasipservice.exceptions.UnprocessableException;
 import sit.int221.oasipservice.repositories.BookingRepository;
 import sit.int221.oasipservice.repositories.CategoryRepository;
 import sit.int221.oasipservice.utils.ListMapper;
@@ -20,8 +17,6 @@ import sit.int221.oasipservice.utils.ListMapper;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 
 @Service
 @Log4j2
@@ -39,6 +34,7 @@ public class CategoryServiceImpl {
     }
 
     public CategoryDto getCategory(Integer id) throws ResourceNotFoundException {
+        log.info("Fetching category id: " + id);
         EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         return modelMapper.map(category, CategoryDto.class);
     }
@@ -69,11 +65,12 @@ public class CategoryServiceImpl {
         return listMapper.mapList(category.getEventBookings(), BookingViewDto.class, modelMapper);
     }
 
-    public void save(CategoryDto newCategory) throws ResponseStatusException {
+    public void save(CategoryDto newCategory) throws UnprocessableException {
+        log.info("Saving a new category...");
         if (repo.existsById(newCategory.getId()))
-            throw new ResponseStatusException(UNPROCESSABLE_ENTITY, newCategory.getId() + " is not unique");
+            throw new UnprocessableException(newCategory.getId() + " is not unique");
         if (isUnique(newCategory.getCategoryName()))
-            throw new ResponseStatusException(UNPROCESSABLE_ENTITY, newCategory.getCategoryName() + " is not unique");
+            throw new UnprocessableException(newCategory.getCategoryName() + " is not unique");
         repo.saveAndFlush(modelMapper.map(newCategory, EventCategory.class));
     }
 
@@ -82,37 +79,45 @@ public class CategoryServiceImpl {
     }
 
     public void delete(Integer id) throws ResourceNotFoundException {
+        log.info("Deleting category id: " + id);
         if (!repo.existsById(id)) throw new ResourceNotFoundException("ID " + id + " is not found");
         repo.deleteById(id);
     }
 
-    public void update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException, ResponseStatusException {
+    public CategoryDto update(Integer id, Map<String, Object> changes) throws IllegalArgumentException, ResourceNotFoundException, UnprocessableException {
         EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-    }
-
-    public CategoryNameDto updateCategoryName(Integer id, CategoryNameDto categoryName) throws ResourceNotFoundException, ResponseStatusException {
-        EventCategory updatedCategory = repo.findById(id).map((oldCategory) -> {
-            if (isUnique(categoryName.getCategoryName()))
-                throw new ResponseStatusException(UNPROCESSABLE_ENTITY, categoryName.getCategoryName() + " is not unique");
-            oldCategory.setCategoryName(categoryName.getCategoryName());
-            return oldCategory;
-        }).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        return modelMapper.map(repo.saveAndFlush(updatedCategory), CategoryNameDto.class);
-    }
-
-    public CategoryDescDto updateCategoryDesc(Integer id, CategoryDescDto description) throws ResourceNotFoundException {
-        EventCategory updatedCategory = repo.findById(id).map((oldCategory) -> {
-            oldCategory.setCategoryDescription(description.getCategoryDescription());
-            return oldCategory;
-        }).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        return modelMapper.map(repo.saveAndFlush(updatedCategory), CategoryDescDto.class);
-    }
-
-    public CategoryDurationDto updateDuration(Integer id, CategoryDurationDto duration) throws ResourceNotFoundException {
-        EventCategory updatedCategory = repo.findById(id).map((oldCategory) -> {
-            oldCategory.setEventDuration(duration.getEventDuration());
-            return oldCategory;
-        }).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        return modelMapper.map(repo.saveAndFlush(updatedCategory), CategoryDurationDto.class);
+        changes.forEach((field, value) -> {
+            switch (field) {
+                case "categoryName" -> {
+                    String categoryName = (String) value;
+                    if (categoryName == null || categoryName.isBlank())
+                        throw new IllegalArgumentException(field + " is must not be null or empty");
+                    if (categoryName.length() > 100 || categoryName.length() < 1)
+                        throw new IllegalArgumentException("size must be between 1 and 100");
+                    if (isUnique(categoryName))
+                        throw new UnprocessableException(categoryName + " is not unique");
+                    log.info("Updating category name of id: " + id);
+                    category.setCategoryName(categoryName.trim());
+                }
+                case "categoryDescription" -> {
+                    String description = (String) value;
+                    if (description.length() > 500)
+                        throw new IllegalArgumentException("size must be between 0 and 500");
+                    log.info("Updating category description of id: " + id);
+                    category.setCategoryDescription(description);
+                }
+                case "eventDuration" -> {
+                    Integer duration = (Integer) value;
+                    if (duration == null)
+                        throw new IllegalArgumentException(field + " is must not be null");
+                    if (duration < 1 || duration > 480)
+                        throw new IllegalArgumentException("duration must be between 1 and 480");
+                    log.info("Updating category duration of id: " + id);
+                    category.setEventDuration(duration);
+                }
+                default -> throw new IllegalArgumentException("Unknown field: " + field);
+            }
+        });
+        return modelMapper.map(repo.saveAndFlush(category), CategoryDto.class);
     }
 }
