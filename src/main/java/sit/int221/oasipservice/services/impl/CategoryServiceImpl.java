@@ -6,11 +6,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryDescDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryDurationDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryNameDto;
-import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
 import sit.int221.oasipservice.repositories.BookingRepository;
@@ -33,7 +33,9 @@ public class CategoryServiceImpl {
     private final ListMapper listMapper;
 
     public List<CategoryDto> getCategories() {
-        return listMapper.mapList(repo.findAll(), CategoryDto.class, modelMapper);
+        log.info("Fetching all categories...");
+        List<EventCategory> categories = repo.findAll();
+        return listMapper.mapList(categories, CategoryDto.class, modelMapper);
     }
 
     public CategoryDto getCategory(Integer id) throws ResourceNotFoundException {
@@ -72,8 +74,7 @@ public class CategoryServiceImpl {
             throw new ResponseStatusException(UNPROCESSABLE_ENTITY, newCategory.getId() + " is not unique");
         if (isUnique(newCategory.getCategoryName()))
             throw new ResponseStatusException(UNPROCESSABLE_ENTITY, newCategory.getCategoryName() + " is not unique");
-        EventCategory category = modelMapper.map(newCategory, EventCategory.class);
-        repo.saveAndFlush(category);
+        repo.saveAndFlush(modelMapper.map(newCategory, EventCategory.class));
     }
 
     private boolean isUnique(String categoryName) {

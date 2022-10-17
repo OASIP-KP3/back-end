@@ -1,40 +1,39 @@
 package sit.int221.oasipservice.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import sit.int221.oasipservice.dto.bookings.BookingDto;
 import sit.int221.oasipservice.dto.bookings.BookingDetailsDto;
+import sit.int221.oasipservice.dto.bookings.BookingDto;
 import sit.int221.oasipservice.dto.bookings.BookingViewDto;
-import sit.int221.oasipservice.dto.bookings.fields.EventDateTimeDto;
-import sit.int221.oasipservice.dto.bookings.fields.EventNotesDto;
 import sit.int221.oasipservice.services.BookingService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
+
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
-@RequestMapping("/api/events")
+@RequiredArgsConstructor
+@RequestMapping("/api/v2/events")
 public class BookingController {
     private final BookingService service;
 
-    @Autowired
-    public BookingController(BookingService service) {
-        this.service = service;
-    }
-
+    // default sorting by "eventStartTime" in descending
     @GetMapping("")
-    public List<BookingViewDto> getEventListSorted() {
-        return service.getEventListSorted();
+    public List<BookingViewDto> getEvents(
+            @RequestParam(defaultValue = "eventStartTime") String sortBy,
+            @RequestParam(defaultValue = "all") String type) {
+        return service.getEvents(sortBy, type);
     }
 
     @GetMapping("/{id}")
-    public BookingDetailsDto getEventDetails(@PathVariable Integer id) {
-        return service.getEventDetails(id);
+    public BookingDetailsDto getEvent(@PathVariable Integer id) {
+        return service.getEvent(id);
     }
 
     @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(CREATED)
     public void createEvent(@Valid @RequestBody BookingDto newBooking) {
         service.save(newBooking);
     }
@@ -44,22 +43,14 @@ public class BookingController {
         service.delete(id);
     }
 
-    @PatchMapping("/{id}/datetime")
-    public EventDateTimeDto updateDateTime(@PathVariable Integer id, @Valid @RequestBody EventDateTimeDto dateTime) {
-        return service.updateDateTime(id, dateTime);
+    @PatchMapping("/{id}")
+    public BookingDetailsDto partialUpdateEvent(
+            @PathVariable Integer id,
+            @RequestBody Map<String, Object> body) {
+        return service.update(id, body);
     }
 
-    @PatchMapping("/{id}/notes")
-    public EventNotesDto updateNotes(@PathVariable Integer id, @Valid @RequestBody EventNotesDto notes) {
-        return service.updateNotes(id, notes);
-    }
-
-    @GetMapping("/types")
-    public List<BookingViewDto> getEventsBy(@RequestParam(defaultValue = "future") String type) {
-        return service.getEventsBy(type);
-    }
-
-    @GetMapping("/dates/{date}")
+    @GetMapping("/date/{date}")
     public List<BookingViewDto> getEventsByDate(@PathVariable String date) {
         return service.getEventsByDate(date);
     }

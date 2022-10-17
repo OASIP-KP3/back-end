@@ -1,17 +1,18 @@
 package sit.int221.oasipservice.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryDescDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryDurationDto;
 import sit.int221.oasipservice.dto.categories.fields.CategoryNameDto;
-import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.services.impl.CategoryServiceImpl;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class CategoryControllerV2 {
     }
 
     @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(CREATED)
     public void createCategory(@Valid @RequestBody CategoryDto newCategory) {
         service.save(newCategory);
     }
