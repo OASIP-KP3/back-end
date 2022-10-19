@@ -10,7 +10,6 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.server.ResponseStatusException;
 import sit.int221.oasipservice.exceptions.UnauthorizedException;
 import sit.int221.oasipservice.exceptions.UnprocessableException;
 import sit.int221.oasipservice.handlers.errors.ErrorObject;
@@ -55,15 +54,8 @@ public class ApplicationExceptionHandler {
     }
 
     @ResponseStatus(UNPROCESSABLE_ENTITY)
-    @ExceptionHandler(ResponseStatusException.class)
-    public ErrorResponse handleServerWebInputException(ResponseStatusException ex) {
-        LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
-        return new ErrorResponse(now, ex.getStatus(), ex.getRawStatusCode(), ex.getReason());
-    }
-
-    @ResponseStatus(UNPROCESSABLE_ENTITY)
     @ExceptionHandler(UnprocessableException.class)
-    public ErrorResponse handleServerWebInputException(UnprocessableException ex) {
+    public ErrorResponse handleUnprocessableException(UnprocessableException ex) {
         LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
         return new ErrorResponse(now, UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY.value(), ex.getMessage());
     }
