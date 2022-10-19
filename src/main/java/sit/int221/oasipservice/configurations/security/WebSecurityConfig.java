@@ -14,7 +14,6 @@ import sit.int221.oasipservice.filters.JwtAuthEntryPoint;
 import sit.int221.oasipservice.filters.JwtRequestFilter;
 
 import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 import static sit.int221.oasipservice.entities.ERole.*;
 
@@ -36,11 +35,14 @@ public class WebSecurityConfig {
         http.sessionManagement()
                 .sessionCreationPolicy(STATELESS);
         http.authorizeRequests()
-                .antMatchers("/api/v2/auth/**").permitAll()
-                .antMatchers(POST, "/api/v2/events").permitAll()
-                .antMatchers("/api/v2/**").hasAuthority(ROLE_ADMIN.getRole())
-                .antMatchers("/api/v2/events/**").hasAuthority(ROLE_STUDENT.getRole())
-                .antMatchers(GET, "/api/v2/events/**").hasAuthority(ROLE_LECTURER.getRole())
+                .antMatchers("/api/v2/auth/**")
+                .anonymous()
+                .antMatchers("/api/v2/users/**")
+                .hasAuthority(ROLE_ADMIN.getRole())
+                .antMatchers(GET, "/api/v2/events", "/api/v2/events/{id}")
+                .hasAnyAuthority(ROLE_ADMIN.getRole(), ROLE_LECTURER.getRole(), ROLE_STUDENT.getRole())
+                .antMatchers("/api/v2/events/**")
+                .hasAnyAuthority(ROLE_ADMIN.getRole(), ROLE_STUDENT.getRole())
                 .anyRequest().authenticated();
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

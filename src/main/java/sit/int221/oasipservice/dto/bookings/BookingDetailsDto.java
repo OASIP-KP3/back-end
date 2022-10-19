@@ -17,9 +17,8 @@ public class BookingDetailsDto {
     private Integer id;
     private String bookingName;
     private String bookingEmail;
-    private CategoryDto eventCategory;
+    private CategoryDto category;
     private LocalDateTime eventStartTime;
-    private Integer eventDuration;
     private String eventNotes;
 
     public String getEventStartDate() {

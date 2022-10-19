@@ -18,12 +18,12 @@ public class BookingViewDto {
     private Integer id;
     private String bookingName;
     @JsonIgnore
-    private CategoryDto eventCategory;
+    private CategoryDto category;
     private LocalDateTime eventStartTime;
     private Integer eventDuration;
 
-    public String getEventCategoryName() {
-        return eventCategory.getCategoryName();
+    public String getCategoryName() {
+        return category.getCategoryName();
     }
 
     public String getEventStartDate() {

@@ -68,8 +68,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private boolean matchPath(String path) {
         final String AUTH_PATH = "/api/v2/auth/";
-        final String MATCH_PATH = "/api/v2/users/match";
-        final String POST_EVENTS_PATH = "/api/v2/events";
-        return path.startsWith(AUTH_PATH) || path.equals(MATCH_PATH) || path.equals(POST_EVENTS_PATH);
+        return path.startsWith(AUTH_PATH);
     }
 }
