@@ -1,5 +1,7 @@
 package sit.int221.oasipservice.annotations;
 
+import sit.int221.oasipservice.annotations.validators.UniqueUsernameValidator;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;

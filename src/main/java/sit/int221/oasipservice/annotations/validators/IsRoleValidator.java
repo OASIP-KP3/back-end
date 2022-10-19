@@ -1,7 +1,8 @@
-package sit.int221.oasipservice.annotations;
+package sit.int221.oasipservice.annotations.validators;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import sit.int221.oasipservice.annotations.IsRole;
 import sit.int221.oasipservice.repositories.RoleRepository;
 
 import javax.validation.ConstraintValidator;

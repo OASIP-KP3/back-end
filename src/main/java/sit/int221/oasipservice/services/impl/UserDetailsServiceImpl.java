@@ -2,6 +2,7 @@ package sit.int221.oasipservice.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 import sit.int221.oasipservice.entities.User;
 import sit.int221.oasipservice.repositories.UserRepository;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         } else {
             log.info("User found in the database");
         }
-        List<SimpleGrantedAuthority> authorities = user.getUserRoles()
+        Collection<GrantedAuthority> authorities = user.getUserRoles()
                 .stream()
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
                 .collect(Collectors.toList());

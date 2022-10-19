@@ -1,6 +1,7 @@
-package sit.int221.oasipservice.annotations;
+package sit.int221.oasipservice.annotations.validators;
 
 import org.springframework.stereotype.Component;
+import sit.int221.oasipservice.annotations.FutureValidation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

@@ -32,9 +32,9 @@ public class EventCategory {
     @Column(name = "event_duration", nullable = false)
     private Integer eventDuration;
 
-    @OneToMany(mappedBy = "eventCategory")
+    @OneToMany(mappedBy = "eventCategory", fetch = FetchType.EAGER)
     private List<EventBooking> eventBookings = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "ownCategories")
+    @ManyToMany(mappedBy = "ownCategories", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<User> owners = new LinkedHashSet<>();
 }
