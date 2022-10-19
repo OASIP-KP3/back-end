@@ -11,8 +11,10 @@ import sit.int221.oasipservice.dto.bookings.BookingDetailsDto;
 import sit.int221.oasipservice.dto.bookings.BookingDto;
 import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.entities.EventBooking;
+import sit.int221.oasipservice.entities.EventCategory;
 import sit.int221.oasipservice.exceptions.UnprocessableException;
 import sit.int221.oasipservice.repositories.BookingRepository;
+import sit.int221.oasipservice.repositories.CategoryRepository;
 import sit.int221.oasipservice.services.BookingService;
 import sit.int221.oasipservice.utils.ListMapper;
 
@@ -27,6 +29,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository repo;
+    private final CategoryRepository categoryRepo;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
 
@@ -50,11 +53,20 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public void save(@NotNull BookingDto newBooking) throws UnprocessableException {
+    public void save(@NotNull BookingDto newBooking) throws ResourceNotFoundException, UnprocessableException {
         log.info("Saving a new booking...");
         if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration()))
             throw new UnprocessableException(newBooking.getEventStartTime() + " is overlap");
-        repo.saveAndFlush(modelMapper.map(newBooking, EventBooking.class));
+        EventBooking booking = new EventBooking();
+        EventCategory category = categoryRepo.findById(newBooking.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category ID " + newBooking.getCategoryId() + " is not found"));
+        booking.setEventCategory(category);
+        booking.setBookingName(newBooking.getBookingName());
+        booking.setBookingEmail(newBooking.getBookingEmail());
+        booking.setEventDuration(newBooking.getEventDuration());
+        booking.setEventStartTime(newBooking.getEventStartTime());
+        booking.setEventNotes(newBooking.getEventNotes());
+        repo.saveAndFlush(booking);
     }
 
     @Override

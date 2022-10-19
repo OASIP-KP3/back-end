@@ -1,6 +1,5 @@
 package sit.int221.oasipservice.dto.bookings;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,15 +17,10 @@ public class BookingDetailsDto {
     private Integer id;
     private String bookingName;
     private String bookingEmail;
-    @JsonIgnore
     private CategoryDto eventCategory;
     private LocalDateTime eventStartTime;
     private Integer eventDuration;
     private String eventNotes;
-
-    public String getEventCategoryName() {
-        return eventCategory.getCategoryName();
-    }
 
     public String getEventStartDate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");

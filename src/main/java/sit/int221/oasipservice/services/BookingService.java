@@ -14,7 +14,7 @@ public interface BookingService {
 
     BookingDetailsDto getEvent(Integer id) throws ResourceNotFoundException;
 
-    void save(BookingDto newBooking) throws UnprocessableException;
+    void save(BookingDto newBooking) throws ResourceNotFoundException, UnprocessableException;
 
     void delete(Integer id) throws ResourceNotFoundException;
 

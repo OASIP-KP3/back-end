@@ -37,10 +37,10 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(STATELESS);
         http.authorizeRequests()
                 .antMatchers("/api/v2/auth/**").permitAll()
+                .antMatchers(POST, "/api/v2/events").permitAll()
                 .antMatchers("/api/v2/**").hasAuthority(ROLE_ADMIN.getRole())
                 .antMatchers("/api/v2/events/**").hasAuthority(ROLE_STUDENT.getRole())
                 .antMatchers(GET, "/api/v2/events/**").hasAuthority(ROLE_LECTURER.getRole())
-                .antMatchers(POST, "/api/v2/events").anonymous()
                 .anyRequest().authenticated();
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
