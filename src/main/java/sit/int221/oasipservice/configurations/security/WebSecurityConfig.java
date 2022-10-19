@@ -13,8 +13,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import sit.int221.oasipservice.filters.JwtAuthEntryPoint;
 import sit.int221.oasipservice.filters.JwtRequestFilter;
 
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-import static sit.int221.oasipservice.entities.ERole.ROLE_ADMIN;
+import static sit.int221.oasipservice.entities.ERole.*;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -35,7 +37,10 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(STATELESS);
         http.authorizeRequests()
                 .antMatchers("/api/v2/auth/**").permitAll()
-                .antMatchers("/api/v2/users/**").hasAnyAuthority(ROLE_ADMIN.getRole())
+                .antMatchers("/api/v2/**").hasAuthority(ROLE_ADMIN.getRole())
+                .antMatchers("/api/v2/events/**").hasAuthority(ROLE_STUDENT.getRole())
+                .antMatchers(GET, "/api/v2/events/**").hasAuthority(ROLE_LECTURER.getRole())
+                .antMatchers(POST, "/api/v2/events").anonymous()
                 .anyRequest().authenticated();
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
