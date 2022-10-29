@@ -5,10 +5,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sit.int221.oasipservice.entities.EventCategory;
 
-import java.util.Set;
+import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<EventCategory, Integer> {
     @Query(value = "SELECT category_name FROM event_category", nativeQuery = true)
-    Set<String> getAllCategoryName();
+    List<String> getAllCategoryName();
 }
