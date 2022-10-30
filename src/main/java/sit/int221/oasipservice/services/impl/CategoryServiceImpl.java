@@ -70,8 +70,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto update(Integer id, @NotNull Map<String, Object> changes) throws IllegalArgumentException, ResourceNotFoundException, UnprocessableException {
-        EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
+    public CategoryDto update(Integer id, @NotNull Map<String, Object> changes) throws ResourceNotFoundException {
+        EventCategory category = repo.findById(id)
+                .map(c -> mapCategory(c, changes))
+                .orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
+        return modelMapper.map(repo.saveAndFlush(category), CategoryDto.class);
+    }
+
+    private EventCategory mapCategory(EventCategory category, Map<String, Object> changes) throws UnprocessableException, IllegalArgumentException {
+        Integer id = category.getId();
         changes.forEach((field, value) -> {
             switch (field) {
                 case "categoryName" -> {
@@ -87,10 +94,10 @@ public class CategoryServiceImpl implements CategoryService {
                 }
                 case "categoryDescription" -> {
                     String description = (String) value;
-                    if (description.length() > 500)
+                    if (description != null && description.length() > 500)
                         throw new IllegalArgumentException("size must be between 0 and 500");
                     log.info("Updating category description of id: " + id);
-                    category.setCategoryDescription(description);
+                    category.setCategoryDescription(description == null ? null : description.trim());
                 }
                 case "eventDuration" -> {
                     if (value == null)
@@ -104,6 +111,6 @@ public class CategoryServiceImpl implements CategoryService {
                 default -> throw new IllegalArgumentException("Unknown field: " + field);
             }
         });
-        return modelMapper.map(repo.saveAndFlush(category), CategoryDto.class);
+        return category;
     }
 }

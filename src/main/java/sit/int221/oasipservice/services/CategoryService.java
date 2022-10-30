@@ -20,5 +20,5 @@ public interface CategoryService {
 
     void delete(Integer id) throws ResourceNotFoundException;
 
-    CategoryDto update(Integer id, @NotNull Map<String, Object> changes) throws IllegalArgumentException, ResourceNotFoundException, UnprocessableException;
+    CategoryDto update(Integer id, @NotNull Map<String, Object> changes) throws ResourceNotFoundException;
 }

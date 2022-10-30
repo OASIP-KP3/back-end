@@ -67,8 +67,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetailsDto update(Integer id, @NotNull Map<String, Object> changes) throws ResourceNotFoundException, UnprocessableException, IllegalArgumentException {
-        User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
+    public UserDetailsDto update(Integer id, @NotNull Map<String, Object> changes) throws ResourceNotFoundException {
+        User user = userRepo.findById(id)
+                .map(u -> mapUser(u, changes))
+                .orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
+        return modelMapper.map(userRepo.saveAndFlush(user), UserDetailsDto.class);
+    }
+
+    @Override
+    public void addRoleToUser(String email, String roleName) {
+        User user = userRepo.findByUserEmail(email);
+        Role role = roleRepo.findByRoleName(roleName);
+        log.info("Adding role " + roleName + " to user id " + user.getId());
+        user.getUserRoles().add(role);
+    }
+
+    @Override
+    public ResponseEntity<String> matchPassword(@NotNull LoginRequest request) throws ResourceNotFoundException, UnauthorizedException {
+        String email = request.getUserEmail();
+        String password = request.getUserPassword();
+        User user = userRepo.findByUserEmail(email);
+        if (user == null) throw new ResourceNotFoundException(email + " is not found");
+        if (!passwordEncoder.matches(password, user.getUserPassword()))
+            throw new UnauthorizedException("Password is incorrect");
+        return ResponseEntity.ok().body("Password is matched");
+    }
+
+    private User mapUser(User user, Map<String, Object> changes) throws UnprocessableException, IllegalArgumentException {
+        Integer id = user.getId();
         changes.forEach((field, value) -> {
             switch (field) {
                 case "userName" -> {
@@ -105,26 +131,7 @@ public class UserServiceImpl implements UserService {
                 default -> throw new IllegalArgumentException("Unknown field: " + field);
             }
         });
-        return modelMapper.map(userRepo.saveAndFlush(user), UserDetailsDto.class);
-    }
-
-    @Override
-    public void addRoleToUser(String email, String roleName) {
-        User user = userRepo.findByUserEmail(email);
-        Role role = roleRepo.findByRoleName(roleName);
-        log.info("Adding role " + roleName + " to user id " + user.getId());
-        user.getUserRoles().add(role);
-    }
-
-    @Override
-    public ResponseEntity<String> matchPassword(@NotNull LoginRequest request) throws ResourceNotFoundException, UnauthorizedException {
-        String email = request.getUserEmail();
-        String password = request.getUserPassword();
-        User user = userRepo.findByUserEmail(email);
-        if (user == null) throw new ResourceNotFoundException(email + " is not found");
-        if (!passwordEncoder.matches(password, user.getUserPassword()))
-            throw new UnauthorizedException("Password is incorrect");
-        return ResponseEntity.ok().body("Password is matched");
+        return user;
     }
 
     private boolean isUsernameUnique(String oldUsername, String newUsername) {

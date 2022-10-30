@@ -18,7 +18,7 @@ public interface BookingService {
 
     void delete(Integer id) throws ResourceNotFoundException;
 
-    BookingDetailsDto update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException, UnprocessableException, IllegalArgumentException;
+    BookingDetailsDto update(Integer id, Map<String, Object> changes) throws ResourceNotFoundException;
 
     List<BookingViewDto> getEventsByDate(String date);
 }

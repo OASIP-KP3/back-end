@@ -2,8 +2,6 @@ package sit.int221.oasipservice.entities;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
@@ -36,12 +34,17 @@ public class User {
     @Column(name = "user_password", nullable = false, length = 100)
     private String userPassword;
 
-    @CreationTimestamp
-    @Column(name = "createdOn", nullable = false, insertable = false, updatable = false)
+    @Column(name = "createdOn",
+            nullable = false,
+            insertable = false,
+            updatable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private OffsetDateTime createdOn;
 
-    @UpdateTimestamp
-    @Column(name = "updatedOn", nullable = false, insertable = false)
+    @Column(name = "updatedOn",
+            nullable = false,
+            insertable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private OffsetDateTime updatedOn;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

@@ -77,8 +77,22 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDetailsDto update(Integer id, @NotNull Map<String, Object> changes) throws ResourceNotFoundException, UnprocessableException, IllegalArgumentException {
-        EventBooking booking = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
+    public BookingDetailsDto update(Integer id, @NotNull Map<String, Object> changes) throws ResourceNotFoundException {
+        EventBooking booking = repo.findById(id)
+                .map(b -> mapBooking(b, changes))
+                .orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
+        return modelMapper.map(repo.saveAndFlush(booking), BookingDetailsDto.class);
+    }
+
+    @Override
+    public List<BookingViewDto> getEventsByDate(String date) {
+        log.info("Fetching all bookings by date: " + date);
+        List<EventBooking> bookings = repo.findAllByByDate(date);
+        return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
+    }
+
+    private EventBooking mapBooking(EventBooking booking, Map<String, Object> changes) throws UnprocessableException, IllegalArgumentException {
+        Integer id = booking.getId();
         changes.forEach((field, value) -> {
             switch (field) {
                 case "eventStartTime" -> {
@@ -92,25 +106,19 @@ public class BookingServiceImpl implements BookingService {
                     if (isOverlap(id, categoryId, dateTime, duration))
                         throw new UnprocessableException(dateTime + " is overlap");
                     log.info("Updating start time of id: " + id);
-                    booking.setEventStartTime(LocalDateTime.parse((String) value));
+                    booking.setEventStartTime(dateTime);
                 }
                 case "eventNotes" -> {
                     String notes = (String) value;
-                    if (notes.length() > 500) throw new IllegalArgumentException("size must be between 0 and 500");
+                    if (notes != null && notes.length() > 500)
+                        throw new IllegalArgumentException("size must be between 0 and 500");
                     log.info("Updating notes of id: " + id);
-                    booking.setEventNotes(notes);
+                    booking.setEventNotes(notes == null ? null : notes.trim());
                 }
                 default -> throw new IllegalArgumentException("Unknown field: " + field);
             }
         });
-        return modelMapper.map(repo.saveAndFlush(booking), BookingDetailsDto.class);
-    }
-
-    @Override
-    public List<BookingViewDto> getEventsByDate(String date) {
-        log.info("Fetching all bookings by date: " + date);
-        List<EventBooking> bookings = repo.findAllByByDate(date);
-        return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
+        return booking;
     }
 
     private boolean isOverlap(Integer id, Integer categoryId, LocalDateTime dateTime, Integer duration) {
