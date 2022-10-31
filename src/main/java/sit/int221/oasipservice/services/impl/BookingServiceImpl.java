@@ -61,7 +61,8 @@ public class BookingServiceImpl implements BookingService {
             List<BookingViewDto> bookings = new ArrayList<>();
             lecturer.getOwnCategories()
                     .stream()
-                    .map(c -> listMapper.mapList(c.getEventBookings(), BookingViewDto.class, modelMapper))
+                    .map(EventCategory::getEventBookings)
+                    .map(b -> listMapper.mapList(b, BookingViewDto.class, modelMapper))
                     .forEach(bookings::addAll);
             if (!type.equals("all")) {
                 List<BookingViewDto> filtered = new ArrayList<>(
@@ -118,9 +119,10 @@ public class BookingServiceImpl implements BookingService {
         log.info("Saving a new booking...");
         if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration()))
             throw new UnprocessableException(newBooking.getEventStartTime() + " is overlap");
-        EventBooking booking = new EventBooking();
-        EventCategory category = categoryRepo.findById(newBooking.getCategoryId())
+        EventCategory category = categoryRepo
+                .findById(newBooking.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("category id " + newBooking.getCategoryId() + " is not found"));
+        EventBooking booking = new EventBooking();
         booking.setEventCategory(category);
         booking.setBookingName(newBooking.getBookingName());
         booking.setBookingEmail(newBooking.getBookingEmail());
