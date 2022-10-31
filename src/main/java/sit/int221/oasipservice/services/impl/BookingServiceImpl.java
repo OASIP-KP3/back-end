@@ -42,7 +42,7 @@ public class BookingServiceImpl implements BookingService {
     private final JwtUtils jwtUtils;
 
     @Override
-    public List<BookingViewDto> getEvents(String sortBy, String type) throws IllegalArgumentException {
+    public List<BookingViewDto> getEvents(String sortBy, String type) {
         if (jwtUtils.getRoles().contains(ROLE_STUDENT.getRole())) {
             log.info("[" + ROLE_STUDENT.getRole() + "]" + " Fetching all bookings...");
             String email = jwtUtils.getEmail();
@@ -106,20 +106,21 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDetailsDto getEvent(Integer id) throws ResourceNotFoundException {
+    public BookingDetailsDto getEvent(Integer id) {
         log.info("Fetching booking id: " + id);
-        EventBooking booking = bookingRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        return modelMapper.map(booking, BookingDetailsDto.class);
+        return bookingRepo.findById(id)
+                .map(booking -> modelMapper.map(booking, BookingDetailsDto.class))
+                .orElseThrow(() -> new ResourceNotFoundException("booking id " + id + " is not found"));
     }
 
     @Override
-    public void save(@NotNull BookingDto newBooking) throws ResourceNotFoundException, UnprocessableException {
+    public void save(@NotNull BookingDto newBooking) {
         log.info("Saving a new booking...");
         if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration()))
             throw new UnprocessableException(newBooking.getEventStartTime() + " is overlap");
         EventBooking booking = new EventBooking();
         EventCategory category = categoryRepo.findById(newBooking.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category ID " + newBooking.getCategoryId() + " is not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("category id " + newBooking.getCategoryId() + " is not found"));
         booking.setEventCategory(category);
         booking.setBookingName(newBooking.getBookingName());
         booking.setBookingEmail(newBooking.getBookingEmail());
@@ -130,18 +131,19 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public void delete(Integer id) throws ResourceNotFoundException {
+    public void delete(Integer id) {
         log.info("Deleting booking id: " + id);
-        if (!bookingRepo.existsById(id)) throw new ResourceNotFoundException("ID " + id + " is not found");
+        if (!bookingRepo.existsById(id)) throw new ResourceNotFoundException("booking id " + id + " is not found");
         bookingRepo.deleteById(id);
     }
 
     @Override
-    public BookingDetailsDto update(Integer id, @NotNull Map<String, Object> changes) throws ResourceNotFoundException {
-        EventBooking booking = bookingRepo.findById(id)
-                .map(b -> mapBooking(b, changes))
-                .orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        return modelMapper.map(bookingRepo.saveAndFlush(booking), BookingDetailsDto.class);
+    public BookingDetailsDto update(Integer id, @NotNull Map<String, Object> changes) {
+        return bookingRepo.findById(id)
+                .map(booking -> mapBooking(booking, changes))
+                .map(bookingRepo::saveAndFlush)
+                .map(updatedBooking -> modelMapper.map(updatedBooking, BookingDetailsDto.class))
+                .orElseThrow(() -> new ResourceNotFoundException("booking id " + id + " is not found"));
     }
 
     @Override
@@ -151,7 +153,7 @@ public class BookingServiceImpl implements BookingService {
         return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
     }
 
-    private EventBooking mapBooking(EventBooking booking, Map<String, Object> changes) throws UnprocessableException, IllegalArgumentException {
+    private EventBooking mapBooking(EventBooking booking, Map<String, Object> changes) {
         Integer id = booking.getId();
         changes.forEach((field, value) -> {
             switch (field) {

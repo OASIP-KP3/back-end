@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtils jwtUtils;
 
     @Override
-    public JwtResponse login(@NotNull LoginRequest request) throws ResourceNotFoundException, UnauthorizedException {
+    public JwtResponse login(@NotNull LoginRequest request) {
         String email = request.getUserEmail();
         String password = request.getUserPassword();
         User user = userRepo.findByUserEmail(email);
@@ -57,11 +57,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public JwtResponse refreshToken(HttpServletRequest request, HttpServletResponse response) throws
-            ResourceNotFoundException,
-            TokenExpiredException,
-            JWTDecodeException,
-            ServletRequestBindingException {
+    public JwtResponse refreshToken(HttpServletRequest request, HttpServletResponse response) throws ServletRequestBindingException {
         if (!jwtUtils.isHeaderValid(request)) {
             String errorMessage = "Invalid header value or missing authorization header";
             log.error(errorMessage);

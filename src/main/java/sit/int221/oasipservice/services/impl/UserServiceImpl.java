@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -42,36 +43,41 @@ public class UserServiceImpl implements UserService {
     public UserPageDto getUsers(int page, int pageSize, String sortBy) {
         log.info("Fetching all users...");
         Sort sort = Sort.by(sortBy).ascending();
-        return modelMapper.map(userRepo.findAll(PageRequest.of(page, pageSize, sort)), UserPageDto.class);
+        Page<User> user = userRepo.findAll(PageRequest.of(page, pageSize, sort));
+        return modelMapper.map(user, UserPageDto.class);
     }
 
     @Override
-    public void delete(Integer id) throws ResourceNotFoundException {
+    public void delete(Integer id) {
         log.info("Deleting user id " + id);
-        if (!userRepo.existsById(id)) throw new ResourceNotFoundException("ID " + id + " is not found");
+        if (!userRepo.existsById(id)) throw new ResourceNotFoundException("user id " + id + " is not found");
         userRepo.deleteById(id);
     }
 
     @Override
-    public UserDetailsDto getUser(Integer id) throws ResourceNotFoundException {
+    public UserDetailsDto getUser(Integer id) {
         log.info("Fetching the details of user id " + id);
-        User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        return modelMapper.map(user, UserDetailsDto.class);
+        return userRepo.findById(id)
+                .map(user -> modelMapper.map(user, UserDetailsDto.class))
+                .orElseThrow(() -> new ResourceNotFoundException("user id " + id + " is not found"));
     }
 
     @Override
-    public List<CategoryDto> getCategoriesByUserId(Integer id) throws ResourceNotFoundException {
+    public List<CategoryDto> getCategoriesByUserId(Integer id) {
         log.info("Fetching the categories by user id " + id);
-        User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        return listMapper.mapList(user.getOwnCategories().stream().toList(), CategoryDto.class, modelMapper);
+        return userRepo.findById(id)
+                .map(user -> user.getOwnCategories().stream().toList())
+                .map(categories -> listMapper.mapList(categories, CategoryDto.class, modelMapper))
+                .orElseThrow(() -> new ResourceNotFoundException("user id " + id + " is not found"));
     }
 
     @Override
-    public UserDetailsDto update(Integer id, @NotNull Map<String, Object> changes) throws ResourceNotFoundException {
-        User user = userRepo.findById(id)
-                .map(u -> mapUser(u, changes))
-                .orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        return modelMapper.map(userRepo.saveAndFlush(user), UserDetailsDto.class);
+    public UserDetailsDto update(Integer id, @NotNull Map<String, Object> changes) {
+        return userRepo.findById(id)
+                .map(user -> mapUser(user, changes))
+                .map(userRepo::saveAndFlush)
+                .map(updatedUser -> modelMapper.map(updatedUser, UserDetailsDto.class))
+                .orElseThrow(() -> new ResourceNotFoundException("user id " + id + " is not found"));
     }
 
     @Override
@@ -83,7 +89,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<String> matchPassword(@NotNull LoginRequest request) throws ResourceNotFoundException, UnauthorizedException {
+    public ResponseEntity<String> matchPassword(@NotNull LoginRequest request) {
         String email = request.getUserEmail();
         String password = request.getUserPassword();
         User user = userRepo.findByUserEmail(email);
@@ -93,7 +99,7 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok().body("Password is matched");
     }
 
-    private User mapUser(User user, Map<String, Object> changes) throws UnprocessableException, IllegalArgumentException {
+    private User mapUser(User user, Map<String, Object> changes) {
         Integer id = user.getId();
         changes.forEach((field, value) -> {
             switch (field) {
@@ -135,7 +141,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean isUsernameUnique(String oldUsername, String newUsername) {
-        for (String username : userRepo.filterUsernameOutBy(oldUsername)) {
+        for (String username : userRepo.filterUserNameOutBy(oldUsername)) {
             if (newUsername.equals(username)) return false;
         }
         return true;

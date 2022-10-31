@@ -8,9 +8,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
-import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
-import sit.int221.oasipservice.exceptions.UnprocessableException;
 import sit.int221.oasipservice.repositories.CategoryRepository;
 import sit.int221.oasipservice.services.CategoryService;
 import sit.int221.oasipservice.utils.ListMapper;
@@ -34,50 +32,46 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto getCategory(Integer id) throws ResourceNotFoundException {
+    public CategoryDto getCategory(Integer id) {
         log.info("Fetching category id: " + id);
-        EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        return modelMapper.map(category, CategoryDto.class);
+        return repo.findById(id)
+                .map(category -> modelMapper.map(category, CategoryDto.class))
+                .orElseThrow(() -> new ResourceNotFoundException("category id " + id + " is not found"));
     }
 
     @Override
-    public List<BookingViewDto> getEventsByCategoryId(Integer id) throws ResourceNotFoundException {
+    public List<BookingViewDto> getEventsByCategoryId(Integer id) {
         log.info("Fetching all bookings from category id: " + id);
-        EventCategory category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        List<EventBooking> bookings = category.getEventBookings();
-        return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
+        return repo.findById(id)
+                .map(EventCategory::getEventBookings)
+                .map(bookings -> listMapper.mapList(bookings, BookingViewDto.class, modelMapper))
+                .orElseThrow(() -> new ResourceNotFoundException("category id " + id + " is not found"));
     }
 
     @Override
-    public void save(@NotNull CategoryDto newCategory) throws UnprocessableException {
+    public void save(@NotNull CategoryDto newCategory) {
         log.info("Saving a new category...");
-        if (repo.existsById(newCategory.getId()))
-            throw new UnprocessableException(newCategory.getId() + " is not unique");
-        if (isUnique(newCategory.getCategoryName()))
-            throw new UnprocessableException(newCategory.getCategoryName() + " is not unique");
-        repo.saveAndFlush(modelMapper.map(newCategory, EventCategory.class));
-    }
-
-    private boolean isUnique(String categoryName) {
-        return repo.getAllCategoryName().contains(categoryName);
+        EventCategory category = modelMapper.map(newCategory, EventCategory.class);
+        repo.saveAndFlush(category);
     }
 
     @Override
-    public void delete(Integer id) throws ResourceNotFoundException {
+    public void delete(Integer id) {
         log.info("Deleting category id: " + id);
-        if (!repo.existsById(id)) throw new ResourceNotFoundException("ID " + id + " is not found");
+        if (!repo.existsById(id)) throw new ResourceNotFoundException("category id " + id + " is not found");
         repo.deleteById(id);
     }
 
     @Override
-    public CategoryDto update(Integer id, @NotNull Map<String, Object> changes) throws ResourceNotFoundException {
-        EventCategory category = repo.findById(id)
-                .map(c -> mapCategory(c, changes))
-                .orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        return modelMapper.map(repo.saveAndFlush(category), CategoryDto.class);
+    public CategoryDto update(Integer id, @NotNull Map<String, Object> changes) {
+        return repo.findById(id)
+                .map(category -> mapCategory(category, changes))
+                .map(repo::saveAndFlush)
+                .map(updatedCategory -> modelMapper.map(updatedCategory, CategoryDto.class))
+                .orElseThrow(() -> new ResourceNotFoundException("category id " + id + " is not found"));
     }
 
-    private EventCategory mapCategory(EventCategory category, Map<String, Object> changes) throws UnprocessableException, IllegalArgumentException {
+    private EventCategory mapCategory(EventCategory category, Map<String, Object> changes) {
         Integer id = category.getId();
         changes.forEach((field, value) -> {
             switch (field) {
@@ -87,8 +81,8 @@ public class CategoryServiceImpl implements CategoryService {
                         throw new IllegalArgumentException(field + " is must not be null or empty");
                     if (categoryName.length() > 100 || categoryName.length() < 1)
                         throw new IllegalArgumentException("size must be between 1 and 100");
-                    if (isUnique(categoryName))
-                        throw new UnprocessableException(categoryName + " is not unique");
+                    if (repo.findByCategoryName(categoryName) != null)
+                        throw new IllegalArgumentException(categoryName + " is not unique");
                     log.info("Updating category name of id: " + id);
                     category.setCategoryName(categoryName.trim());
                 }

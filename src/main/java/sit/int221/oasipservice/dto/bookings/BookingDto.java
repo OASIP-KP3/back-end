@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sit.int221.oasipservice.annotations.FutureValidation;
+import sit.int221.oasipservice.annotations.UniqueCategoryId;
 
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
@@ -29,6 +30,8 @@ public class BookingDto {
     private String bookingEmail;
 
     @NotNull
+    @Min(1)
+    @UniqueCategoryId
     private Integer categoryId;
 
     @NotNull

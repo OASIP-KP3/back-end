@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sit.int221.oasipservice.annotations.UniqueCategory;
+import sit.int221.oasipservice.annotations.UniqueCategoryId;
 
 import javax.validation.constraints.*;
 
@@ -14,10 +16,12 @@ import javax.validation.constraints.*;
 public class CategoryDto {
     @NotNull
     @Min(1)
+    @UniqueCategoryId
     private Integer id;
 
     @NotNull
     @NotEmpty
+    @UniqueCategory
     @Size(min = 1, max = 100)
     @Pattern(regexp = "^[^\s].+[^\s]$", message = "leading or trailing white spaces do not allowed in the string")
     private String categoryName;
