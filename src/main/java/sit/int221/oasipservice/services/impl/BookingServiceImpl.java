@@ -12,35 +12,95 @@ import sit.int221.oasipservice.dto.bookings.BookingDto;
 import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
+import sit.int221.oasipservice.entities.User;
 import sit.int221.oasipservice.exceptions.UnprocessableException;
 import sit.int221.oasipservice.repositories.BookingRepository;
 import sit.int221.oasipservice.repositories.CategoryRepository;
+import sit.int221.oasipservice.repositories.UserRepository;
 import sit.int221.oasipservice.services.BookingService;
+import sit.int221.oasipservice.utils.JwtUtils;
 import sit.int221.oasipservice.utils.ListMapper;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static sit.int221.oasipservice.entities.ERole.*;
 
 @Service
 @Log4j2
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
-    private final BookingRepository repo;
+    private final BookingRepository bookingRepo;
+    private final UserRepository userRepo;
     private final CategoryRepository categoryRepo;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
+    private final JwtUtils jwtUtils;
 
     @Override
     public List<BookingViewDto> getEvents(String sortBy, String type) throws IllegalArgumentException {
-        log.info("Fetching all bookings...");
-        List<EventBooking> bookings = repo.findAll(Sort.by(sortBy).descending());
+        if (jwtUtils.getRoles().contains(ROLE_STUDENT.getRole())) {
+            log.info("[" + ROLE_STUDENT.getRole() + "]" + " Fetching all bookings...");
+            String email = jwtUtils.getEmail();
+            return switch (type) {
+                case "all" ->
+                        listMapper.mapList(bookingRepo.findByBookingEmail(email), BookingViewDto.class, modelMapper);
+                case "end" -> listMapper.mapList(bookingRepo.getPastEvents(email), BookingViewDto.class, modelMapper);
+                case "ongoing" ->
+                        listMapper.mapList(bookingRepo.getFutureEvents(email), BookingViewDto.class, modelMapper);
+                default -> throw new IllegalArgumentException("Unknown type: " + type);
+            };
+        }
+        if (jwtUtils.getRoles().contains(ROLE_LECTURER.getRole())) {
+            log.info("[" + ROLE_LECTURER.getRole() + "]" + " Fetching all bookings...");
+            User lecturer = userRepo.findByUserEmail(jwtUtils.getEmail());
+            List<BookingViewDto> bookings = new ArrayList<>();
+            lecturer.getOwnCategories()
+                    .stream()
+                    .map(c -> listMapper.mapList(c.getEventBookings(), BookingViewDto.class, modelMapper))
+                    .forEach(bookings::addAll);
+            if (!type.equals("all")) {
+                List<BookingViewDto> filtered = new ArrayList<>(
+                        bookings
+                                .stream()
+                                .filter(b -> {
+                                    final String TIME_ZONE = "GMT+07:00";
+                                    LocalDateTime endDateTime = getEndDateTime(b);
+                                    switch (type) {
+                                        case "end" -> {
+                                            return endDateTime.isBefore(LocalDateTime.now(ZoneId.of(TIME_ZONE)));
+                                        }
+                                        case "ongoing" -> {
+                                            return endDateTime.isAfter(LocalDateTime.now(ZoneId.of(TIME_ZONE)));
+                                        }
+                                        default -> throw new IllegalArgumentException("Unknown type: " + type);
+                                    }
+                                }).toList()
+                );
+                switch (type) {
+                    case "end" -> filtered.sort((o1, o2) -> getEndDateTime(o2).compareTo(getEndDateTime(o1)));
+                    case "ongoing" -> filtered.sort((o1, o2) -> getEndDateTime(o1).compareTo(getEndDateTime(o2)));
+                    default -> throw new IllegalArgumentException("Unknown type: " + type);
+                }
+                return filtered;
+            }
+            bookings.sort(((o1, o2) -> getEndDateTime(o2).compareTo(getEndDateTime(o1))));
+            return bookings;
+        }
+        if (jwtUtils.getRoles().contains(ROLE_ADMIN.getRole())) {
+            log.info("[" + ROLE_ADMIN.getRole() + "]" + " Fetching all bookings...");
+        } else {
+            log.info("Fetching all bookings...");
+        }
+        List<EventBooking> bookings = bookingRepo.findAll(Sort.by(sortBy).descending());
         return switch (type) {
             case "all" -> listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
-            case "end" -> listMapper.mapList(repo.getPastEvents(), BookingViewDto.class, modelMapper);
-            case "ongoing" -> listMapper.mapList(repo.getFutureEvents(), BookingViewDto.class, modelMapper);
+            case "end" -> listMapper.mapList(bookingRepo.getPastEvents(), BookingViewDto.class, modelMapper);
+            case "ongoing" -> listMapper.mapList(bookingRepo.getFutureEvents(), BookingViewDto.class, modelMapper);
             default -> throw new IllegalArgumentException("Unknown type: " + type);
         };
     }
@@ -48,7 +108,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDetailsDto getEvent(Integer id) throws ResourceNotFoundException {
         log.info("Fetching booking id: " + id);
-        EventBooking booking = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
+        EventBooking booking = bookingRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
         return modelMapper.map(booking, BookingDetailsDto.class);
     }
 
@@ -66,28 +126,28 @@ public class BookingServiceImpl implements BookingService {
         booking.setEventDuration(newBooking.getEventDuration());
         booking.setEventStartTime(newBooking.getEventStartTime());
         booking.setEventNotes(newBooking.getEventNotes());
-        repo.saveAndFlush(booking);
+        bookingRepo.saveAndFlush(booking);
     }
 
     @Override
     public void delete(Integer id) throws ResourceNotFoundException {
         log.info("Deleting booking id: " + id);
-        if (!repo.existsById(id)) throw new ResourceNotFoundException("ID " + id + " is not found");
-        repo.deleteById(id);
+        if (!bookingRepo.existsById(id)) throw new ResourceNotFoundException("ID " + id + " is not found");
+        bookingRepo.deleteById(id);
     }
 
     @Override
     public BookingDetailsDto update(Integer id, @NotNull Map<String, Object> changes) throws ResourceNotFoundException {
-        EventBooking booking = repo.findById(id)
+        EventBooking booking = bookingRepo.findById(id)
                 .map(b -> mapBooking(b, changes))
                 .orElseThrow(() -> new ResourceNotFoundException("ID " + id + " is not found"));
-        return modelMapper.map(repo.saveAndFlush(booking), BookingDetailsDto.class);
+        return modelMapper.map(bookingRepo.saveAndFlush(booking), BookingDetailsDto.class);
     }
 
     @Override
     public List<BookingViewDto> getEventsByDate(String date) {
         log.info("Fetching all bookings by date: " + date);
-        List<EventBooking> bookings = repo.findAllByByDate(date);
+        List<EventBooking> bookings = bookingRepo.findAllByByDate(date);
         return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
     }
 
@@ -101,8 +161,8 @@ public class BookingServiceImpl implements BookingService {
                     LocalDateTime dateTime = LocalDateTime.parse((String) value);
                     if (dateTime.isBefore(LocalDateTime.now(ZoneId.of(TIME_ZONE))))
                         throw new IllegalArgumentException(field + " is must be a date and time in the future");
-                    Integer duration = repo.getEventDurationById(id);
-                    Integer categoryId = repo.getEventCategoryIdById(id);
+                    Integer duration = bookingRepo.getEventDurationById(id);
+                    Integer categoryId = bookingRepo.getEventCategoryIdById(id);
                     if (isOverlap(id, categoryId, dateTime, duration))
                         throw new UnprocessableException(dateTime + " is overlap");
                     log.info("Updating start time of id: " + id);
@@ -125,7 +185,7 @@ public class BookingServiceImpl implements BookingService {
         LocalTime startA = getStartTime(dateTime);
         LocalTime endA = getEndTime(dateTime, duration);
         String date = dateTime.toLocalDate().toString();
-        List<EventBooking> bookings = repo.findAllByDateAndCategory(date, categoryId, id);
+        List<EventBooking> bookings = bookingRepo.findAllByDateAndCategory(date, categoryId, id);
         return checkOverlap(startA, endA, bookings);
     }
 
@@ -133,7 +193,7 @@ public class BookingServiceImpl implements BookingService {
         LocalTime startA = getStartTime(dateTime);
         LocalTime endA = getEndTime(dateTime, duration);
         String date = dateTime.toLocalDate().toString();
-        List<EventBooking> bookings = repo.findAllByDateAndCategory(date, categoryId);
+        List<EventBooking> bookings = bookingRepo.findAllByDateAndCategory(date, categoryId);
         return checkOverlap(startA, endA, bookings);
     }
 
@@ -153,5 +213,10 @@ public class BookingServiceImpl implements BookingService {
 
     private LocalTime getEndTime(LocalDateTime dateTime, Integer duration) {
         return dateTime.toLocalTime().plusMinutes(duration.longValue());
+    }
+
+    private LocalDateTime getEndDateTime(BookingViewDto booking) {
+        LocalDateTime startDateTime = LocalDateTime.parse(booking.getStartDateTime());
+        return startDateTime.plusMinutes(booking.getEventDuration());
     }
 }

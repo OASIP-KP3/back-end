@@ -56,4 +56,18 @@ public interface BookingRepository extends JpaRepository<EventBooking, Integer> 
             "AND DATE_ADD(event_start_time, INTERVAL event_duration MINUTE) > now() " +
             "ORDER BY event_start_time", nativeQuery = true)
     List<EventBooking> getFutureEventsByDateAndCategory(Integer categoryId);
+
+    List<EventBooking> findByBookingEmail(String email);
+
+    @Query(value = "SELECT * FROM event_booking " +
+            "WHERE booking_email = ?1 " +
+            "AND DATE_ADD(event_start_time, INTERVAL event_duration MINUTE) > now() " +
+            "ORDER BY event_start_time", nativeQuery = true)
+    List<EventBooking> getFutureEvents(String email);
+
+    @Query(value = "SELECT * FROM event_booking " +
+            "WHERE booking_email = ?1 " +
+            "AND DATE_ADD(event_start_time, INTERVAL event_duration MINUTE) < now() " +
+            "ORDER BY event_start_time DESC", nativeQuery = true)
+    List<EventBooking> getPastEvents(String email);
 }

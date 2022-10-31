@@ -5,7 +5,9 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import sit.int221.oasipservice.payload.response.JwtResponse;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -21,6 +24,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @Component
 public class JwtUtils {
     private final String ROLES = "roles";
+    private final String TOKEN_TYPE = "Bearer ";
     private String secretKey;
     private int jwtExpirationInMs;
     private int refreshExpirationInMs;
@@ -86,9 +90,8 @@ public class JwtUtils {
     }
 
     public boolean isHeaderValid(HttpServletRequest request) {
-        final String START_HEADER = "Bearer ";
         String header = request.getHeader(AUTHORIZATION);
-        return header != null && header.startsWith(START_HEADER);
+        return header != null && header.startsWith(TOKEN_TYPE);
     }
 
     public boolean isTokenExpired(String token) {
@@ -100,8 +103,22 @@ public class JwtUtils {
     }
 
     public String getToken(HttpServletRequest request) {
-        final String START_HEADER = "Bearer ";
         String header = request.getHeader(AUTHORIZATION);
-        return header.substring(START_HEADER.length());
+        return header.substring(TOKEN_TYPE.length());
+    }
+
+    public Set<String> getRoles() {
+        return getAuthentication().getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+    }
+
+    public String getEmail() {
+        return getAuthentication().getName();
+    }
+
+    private Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 }

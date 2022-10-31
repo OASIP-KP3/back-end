@@ -16,8 +16,7 @@ import sit.int221.oasipservice.filters.JwtRequestFilter;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-import static sit.int221.oasipservice.entities.ERole.ROLE_ADMIN;
-import static sit.int221.oasipservice.entities.ERole.ROLE_STUDENT;
+import static sit.int221.oasipservice.entities.ERole.*;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -41,10 +40,12 @@ public class WebSecurityConfig {
                 .permitAll()
                 .antMatchers("/api/v2/auth/**")
                 .anonymous()
-                .antMatchers(GET, "/api/v2/events", "/api/v2/events/{id}", "/api/v2/categories", "/api/v2/categories/{id}")
+                .antMatchers(GET, "/api/v2/categories", "/api/v2/categories/{id}")
                 .anonymous()
                 .antMatchers("/api/v2/users/**", "/api/v2/categories/**")
                 .hasAuthority(ROLE_ADMIN.getRole())
+                .antMatchers(GET, "/api/v2/events", "/api/v2/events/{id}")
+                .hasAnyAuthority(ROLE_ADMIN.getRole(), ROLE_LECTURER.getRole(), ROLE_STUDENT.getRole())
                 .antMatchers("/api/v2/events/**")
                 .hasAnyAuthority(ROLE_ADMIN.getRole(), ROLE_STUDENT.getRole())
                 .anyRequest().authenticated();
