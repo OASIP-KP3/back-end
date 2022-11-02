@@ -1,6 +1,7 @@
 package sit.int221.oasipservice.dto.users;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class UserDetailsDto {
     private Integer id;
     private String userName;
     private String userEmail;
+    @JsonIgnore
     private Set<Role> userRoles = new LinkedHashSet<>();
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -27,6 +29,11 @@ public class UserDetailsDto {
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private OffsetDateTime updatedOn;
+
+    // assume that user has only one role
+    public String getRole() {
+        return userRoles.stream().toList().get(0).getRoleName();
+    }
 
     public String getCreatedDate() {
         return getLocalDate(createdOn);
