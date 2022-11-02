@@ -35,6 +35,6 @@ public class EventCategory {
     @OneToMany(mappedBy = "eventCategory", fetch = FetchType.EAGER)
     private List<EventBooking> eventBookings = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "ownCategories", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "ownCategories", fetch = FetchType.EAGER)
     private Set<User> owners = new LinkedHashSet<>();
 }
