@@ -1,7 +1,6 @@
 package sit.int221.oasipservice.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.oasipservice.dto.bookings.BookingDetailsDto;
 import sit.int221.oasipservice.dto.bookings.BookingDto;
@@ -35,7 +34,7 @@ public class BookingController {
 
     @PostMapping("")
     @ResponseStatus(CREATED)
-    @PreAuthorize("!isAuthenticated() or hasAnyAuthority('admin', 'student')")
+//    @PreAuthorize("!isAuthenticated() or hasAnyAuthority('admin', 'student')")
     public void createEvent(@Valid @RequestBody BookingDto newBooking) {
         service.save(newBooking);
     }
