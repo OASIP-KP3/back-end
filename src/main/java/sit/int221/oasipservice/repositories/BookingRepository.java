@@ -57,6 +57,9 @@ public interface BookingRepository extends JpaRepository<EventBooking, Integer> 
             "ORDER BY event_start_time", nativeQuery = true)
     List<EventBooking> getFutureEventsByDateAndCategory(Integer categoryId);
 
+    @Query(value = "SELECT * FROM event_booking " +
+            "WHERE booking_email = ?1 " +
+            "ORDER BY event_start_time DESC", nativeQuery = true)
     List<EventBooking> findByBookingEmail(String email);
 
     @Query(value = "SELECT * FROM event_booking " +

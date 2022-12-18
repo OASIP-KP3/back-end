@@ -13,6 +13,8 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/users")
@@ -39,6 +41,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(NO_CONTENT)
     public void deleteUser(@PathVariable Integer id) {
         service.delete(id);
     }

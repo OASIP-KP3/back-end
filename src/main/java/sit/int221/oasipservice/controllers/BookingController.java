@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,6 +41,7 @@ public class BookingController {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(NO_CONTENT)
     public void deleteEvent(@PathVariable Integer id) {
         service.delete(id);
     }
