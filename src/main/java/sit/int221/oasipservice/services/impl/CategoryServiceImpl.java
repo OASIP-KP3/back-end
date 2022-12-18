@@ -49,10 +49,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void save(@NotNull CategoryDto newCategory) {
+    public CategoryDto save(@NotNull CategoryDto newCategory) {
         log.info("Saving a new category...");
         EventCategory category = modelMapper.map(newCategory, EventCategory.class);
         repo.saveAndFlush(category);
+        return modelMapper.map(category, CategoryDto.class);
     }
 
     @Override

@@ -36,8 +36,8 @@ public class CategoryController {
 
     @PostMapping("")
     @ResponseStatus(CREATED)
-    public void createCategory(@Valid @RequestBody CategoryDto newCategory) {
-        service.save(newCategory);
+    public CategoryDto createCategory(@Valid @RequestBody CategoryDto newCategory) {
+        return service.save(newCategory);
     }
 
     @DeleteMapping("/{id}")

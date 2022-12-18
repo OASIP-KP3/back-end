@@ -14,7 +14,7 @@ public interface CategoryService {
 
     List<BookingViewDto> getEventsByCategoryId(Integer id);
 
-    void save(@NotNull CategoryDto newCategory);
+    CategoryDto save(@NotNull CategoryDto newCategory);
 
     void delete(Integer id);
 
