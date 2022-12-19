@@ -61,10 +61,10 @@ public class UserDetailsDto {
     }
 
     public OffsetDateTime getCreatedOn() {
-        return createdOn.atZoneSameInstant(ZoneId.systemDefault()).toOffsetDateTime();
+        return createdOn.atZoneSameInstant(ZoneId.of("Asia/Bangkok")).toOffsetDateTime();
     }
 
     public OffsetDateTime getUpdatedOn() {
-        return updatedOn.atZoneSameInstant(ZoneId.systemDefault()).toOffsetDateTime();
+        return updatedOn.atZoneSameInstant(ZoneId.of("Asia/Bangkok")).toOffsetDateTime();
     }
 }
