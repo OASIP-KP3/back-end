@@ -9,7 +9,7 @@ import lombok.Setter;
 import sit.int221.oasipservice.entities.Role;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -61,10 +61,10 @@ public class UserDetailsDto {
     }
 
     public OffsetDateTime getCreatedOn() {
-        return createdOn.atZoneSameInstant(ZoneId.of("Asia/Bangkok")).toOffsetDateTime();
+        return createdOn.withOffsetSameInstant(ZoneOffset.of("+07:00"));
     }
 
     public OffsetDateTime getUpdatedOn() {
-        return updatedOn.atZoneSameInstant(ZoneId.of("Asia/Bangkok")).toOffsetDateTime();
+        return updatedOn.withOffsetSameInstant(ZoneOffset.of("+07:00"));
     }
 }
