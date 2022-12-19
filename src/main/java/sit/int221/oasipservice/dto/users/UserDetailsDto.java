@@ -9,8 +9,6 @@ import lombok.Setter;
 import sit.int221.oasipservice.entities.Role;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -35,36 +33,4 @@ public class UserDetailsDto {
     public String getRole() {
         return userRoles.stream().toList().get(0).getRoleName();
     }
-
-    public String getCreatedDate() {
-        return getLocalDate(createdOn);
-    }
-
-    public String getUpdatedDate() {
-        return getLocalDate(updatedOn);
-    }
-
-    public String getCreatedTime() {
-        return getLocalTime(createdOn);
-    }
-
-    public String getUpdatedTime() {
-        return getLocalTime(updatedOn);
-    }
-
-    private String getLocalTime(OffsetDateTime dateTime) {
-        return dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-    }
-
-    private String getLocalDate(OffsetDateTime dateTime) {
-        return dateTime.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"));
-    }
-
-//    public OffsetDateTime getCreatedOn() {
-//        return createdOn.withOffsetSameInstant(ZoneOffset.of("+07:00"));
-//    }
-//
-//    public OffsetDateTime getUpdatedOn() {
-//        return updatedOn.withOffsetSameInstant(ZoneOffset.of("+07:00"));
-//    }
 }
