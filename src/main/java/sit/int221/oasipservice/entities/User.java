@@ -48,7 +48,6 @@ public class User {
     @Column(name = "updatedOn",
             nullable = false,
             insertable = false,
-            updatable = false,
             columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private OffsetDateTime updatedOn;
 
