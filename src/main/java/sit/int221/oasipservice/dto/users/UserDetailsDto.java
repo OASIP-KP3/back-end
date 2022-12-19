@@ -53,18 +53,18 @@ public class UserDetailsDto {
     }
 
     private String getLocalTime(OffsetDateTime dateTime) {
-        return dateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        return dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
 
     private String getLocalDate(OffsetDateTime dateTime) {
-        return dateTime.toLocalDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy"));
+        return dateTime.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"));
     }
 
-    public OffsetDateTime getCreatedOn() {
-        return createdOn.withOffsetSameInstant(ZoneOffset.of("+07:00"));
-    }
-
-    public OffsetDateTime getUpdatedOn() {
-        return updatedOn.withOffsetSameInstant(ZoneOffset.of("+07:00"));
-    }
+//    public OffsetDateTime getCreatedOn() {
+//        return createdOn.withOffsetSameInstant(ZoneOffset.of("+07:00"));
+//    }
+//
+//    public OffsetDateTime getUpdatedOn() {
+//        return updatedOn.withOffsetSameInstant(ZoneOffset.of("+07:00"));
+//    }
 }
