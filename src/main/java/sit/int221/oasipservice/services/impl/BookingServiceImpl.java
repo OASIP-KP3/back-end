@@ -13,6 +13,7 @@ import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
 import sit.int221.oasipservice.entities.User;
+import sit.int221.oasipservice.exceptions.ForbiddenException;
 import sit.int221.oasipservice.exceptions.UnprocessableException;
 import sit.int221.oasipservice.repositories.BookingRepository;
 import sit.int221.oasipservice.repositories.CategoryRepository;
@@ -108,17 +109,38 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDetailsDto getEvent(Integer id) {
-        log.info("Fetching booking id: " + id);
-        return bookingRepo.findById(id)
-                .map(booking -> modelMapper.map(booking, BookingDetailsDto.class))
+        EventBooking booking = bookingRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("booking id " + id + " is not found"));
+        if (jwtUtils.getRoles().contains(ROLE_STUDENT.getRole())) {
+            if (!jwtUtils.getEmail().equals(booking.getBookingEmail())) {
+                throw new ForbiddenException("the booking email must be the same as the student's email");
+            }
+        }
+        if (jwtUtils.getRoles().contains(ROLE_LECTURER.getRole())) {
+            User user = userRepo.findByUserEmail(jwtUtils.getEmail());
+            List<Integer> list = user.getOwnCategories()
+                    .stream()
+                    .map(EventCategory::getId)
+                    .toList();
+            if (!list.contains(booking.getEventCategory().getId())) {
+                throw new ForbiddenException("this lecturer does not own this category id: " + booking.getEventCategory().getId());
+            }
+        }
+        log.info("Fetching booking id: " + id);
+        return modelMapper.map(booking, BookingDetailsDto.class);
     }
 
     @Override
     public void save(@NotNull BookingDto newBooking) {
         log.info("Saving a new booking...");
-        if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration()))
+        if (isOverlap(newBooking.getCategoryId(), newBooking.getEventStartTime(), newBooking.getEventDuration())) {
             throw new UnprocessableException(newBooking.getEventStartTime() + " is overlap");
+        }
+        if (jwtUtils.getRoles().contains(ROLE_STUDENT.getRole())) {
+            if (!jwtUtils.getEmail().equals(newBooking.getBookingEmail())) {
+                throw new IllegalArgumentException("the booking email must be the same as the student's email");
+            }
+        }
         EventCategory category = categoryRepo
                 .findById(newBooking.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("category id " + newBooking.getCategoryId() + " is not found"));
@@ -134,13 +156,27 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public void delete(Integer id) {
-        log.info("Deleting booking id: " + id);
         if (!bookingRepo.existsById(id)) throw new ResourceNotFoundException("booking id " + id + " is not found");
+        EventBooking booking = bookingRepo.getEventBookingById(id);
+        if (jwtUtils.getRoles().contains(ROLE_STUDENT.getRole())) {
+            if (!jwtUtils.getEmail().equals(booking.getBookingEmail())) {
+                throw new ForbiddenException("the booking email must be the same as the student's email");
+            }
+        }
+        log.info("Deleting booking id: " + id);
         bookingRepo.deleteById(id);
     }
 
     @Override
     public BookingDetailsDto update(Integer id, @NotNull Map<String, Object> changes) {
+        if (jwtUtils.getRoles().contains(ROLE_STUDENT.getRole())) {
+            EventBooking booking = bookingRepo.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("booking id " + id + " is not found"));
+            if (!jwtUtils.getEmail().equals(booking.getBookingEmail())) {
+                throw new ForbiddenException("the booking email must be the same as the student's email");
+            }
+        }
+        log.info("Updating field " + changes.keySet() + " of booking id: " + id);
         return bookingRepo.findById(id)
                 .map(booking -> mapBooking(booking, changes))
                 .map(bookingRepo::saveAndFlush)

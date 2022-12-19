@@ -22,6 +22,9 @@ public interface BookingRepository extends JpaRepository<EventBooking, Integer> 
             "ORDER BY time(event_start_time)", nativeQuery = true)
     List<EventBooking> findAllByDateAndCategory(String date, Integer categoryId);
 
+    @Query(value = "SELECT * FROM event_booking WHERE booking_id = ?1", nativeQuery = true)
+    EventBooking getEventBookingById(Integer id);
+
     @Query(value = "SELECT event_duration " +
             "FROM event_booking WHERE booking_id = ?1", nativeQuery = true)
     Integer getEventDurationById(Integer id);

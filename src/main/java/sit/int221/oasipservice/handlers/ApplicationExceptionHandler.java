@@ -10,6 +10,7 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import sit.int221.oasipservice.exceptions.ForbiddenException;
 import sit.int221.oasipservice.exceptions.UnauthorizedException;
 import sit.int221.oasipservice.exceptions.UnprocessableException;
 import sit.int221.oasipservice.handlers.errors.ErrorObject;
@@ -65,6 +66,13 @@ public class ApplicationExceptionHandler {
     public ErrorResponse handleUnauthorizedException(UnauthorizedException ex) {
         LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
         return new ErrorResponse(now, UNAUTHORIZED, UNAUTHORIZED.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(FORBIDDEN)
+    @ExceptionHandler(ForbiddenException.class)
+    public ErrorResponse handleForbiddenException(ForbiddenException ex) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of(TIME_ZONE));
+        return new ErrorResponse(now, FORBIDDEN, FORBIDDEN.value(), ex.getMessage());
     }
 
     @ResponseStatus(UNAUTHORIZED)
