@@ -117,8 +117,8 @@ public class BookingServiceImpl implements BookingService {
             }
         }
         if (jwtUtils.getRoles().contains(ROLE_LECTURER.getRole())) {
-            User user = userRepo.findByUserEmail(jwtUtils.getEmail());
-            List<Integer> list = user.getOwnCategories()
+            User lecturer = userRepo.findByUserEmail(jwtUtils.getEmail());
+            List<Integer> list = lecturer.getOwnCategories()
                     .stream()
                     .map(EventCategory::getId)
                     .toList();

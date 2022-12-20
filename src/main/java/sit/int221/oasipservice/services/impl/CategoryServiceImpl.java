@@ -8,21 +8,31 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import sit.int221.oasipservice.dto.bookings.BookingViewDto;
 import sit.int221.oasipservice.dto.categories.CategoryDto;
+import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
+import sit.int221.oasipservice.entities.User;
+import sit.int221.oasipservice.exceptions.ForbiddenException;
 import sit.int221.oasipservice.repositories.CategoryRepository;
+import sit.int221.oasipservice.repositories.UserRepository;
 import sit.int221.oasipservice.services.CategoryService;
+import sit.int221.oasipservice.utils.JwtUtils;
 import sit.int221.oasipservice.utils.ListMapper;
 
 import java.util.List;
 import java.util.Map;
+
+import static sit.int221.oasipservice.entities.ERole.ROLE_LECTURER;
+import static sit.int221.oasipservice.entities.ERole.ROLE_STUDENT;
 
 @Service
 @Log4j2
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository repo;
+    private final UserRepository userRepo;
     private final ModelMapper modelMapper;
     private final ListMapper listMapper;
+    private final JwtUtils jwtUtils;
 
     @Override
     public List<CategoryDto> getCategories() {
@@ -41,11 +51,29 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<BookingViewDto> getEventsByCategoryId(Integer id) {
-        log.info("Fetching all bookings from category id: " + id);
-        return repo.findById(id)
+        List<EventBooking> bookings = repo.findById(id)
                 .map(EventCategory::getEventBookings)
-                .map(bookings -> listMapper.mapList(bookings, BookingViewDto.class, modelMapper))
                 .orElseThrow(() -> new ResourceNotFoundException("category id " + id + " is not found"));
+        if (jwtUtils.getRoles().contains(ROLE_STUDENT.getRole())) {
+            List<EventBooking> studentBookings = bookings
+                    .stream()
+                    .filter(b -> b.getBookingEmail().equals(jwtUtils.getEmail()))
+                    .toList();
+            return listMapper.mapList(studentBookings, BookingViewDto.class, modelMapper);
+        }
+        if (jwtUtils.getRoles().contains(ROLE_LECTURER.getRole())) {
+            User lecturer = userRepo.findByUserEmail(jwtUtils.getEmail());
+            List<Integer> list = lecturer.getOwnCategories()
+                    .stream()
+                    .map(EventCategory::getId)
+                    .toList();
+            if (!list.contains(id)) {
+                throw new ForbiddenException("this lecturer does not own this category id: " + id);
+            }
+            return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
+        }
+        log.info("Fetching all bookings from category id: " + id);
+        return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
     }
 
     @Override
