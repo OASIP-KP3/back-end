@@ -28,6 +28,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static sit.int221.oasipservice.entities.ERole.*;
 
@@ -59,12 +60,12 @@ public class BookingServiceImpl implements BookingService {
         if (jwtUtils.getRoles().contains(ROLE_LECTURER.getRole())) {
             log.info("[" + ROLE_LECTURER.getRole() + "]" + " Fetching all bookings...");
             User lecturer = userRepo.findByUserEmail(jwtUtils.getEmail());
-            List<BookingViewDto> bookings = new ArrayList<>();
-            lecturer.getOwnCategories()
+            List<BookingViewDto> bookings = lecturer.getOwnCategories()
                     .stream()
                     .map(EventCategory::getEventBookings)
-                    .map(b -> listMapper.mapList(b, BookingViewDto.class, modelMapper))
-                    .forEach(bookings::addAll);
+                    .flatMap(List::stream)
+                    .map(b -> modelMapper.map(b, BookingViewDto.class))
+                    .collect(Collectors.toList());
             if (!type.equals("all")) {
                 List<BookingViewDto> filtered = new ArrayList<>(
                         bookings
