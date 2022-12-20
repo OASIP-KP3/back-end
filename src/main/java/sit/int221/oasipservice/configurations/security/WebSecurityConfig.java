@@ -38,7 +38,7 @@ public class WebSecurityConfig {
         http.authorizeRequests()
                 .antMatchers("/api/v2/auth/**").permitAll()
                 .antMatchers(POST, "/api/v2/events").permitAll()
-                .antMatchers(GET, "/api/v2/categories", "/api/v2/categories/{id}").permitAll()
+                .antMatchers(GET, "/api/v2/categories", "/api/v2/categories/{id}", "/api/v2/categories/{id}/events").permitAll()
                 .antMatchers("/api/v2/users/**", "/api/v2/categories/**")
                 .hasAuthority(ROLE_ADMIN.getRole())
                 .antMatchers(GET, "/api/v2/events", "/api/v2/events/{id}")
