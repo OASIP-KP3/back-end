@@ -11,13 +11,13 @@ import sit.int221.oasipservice.dto.categories.CategoryDto;
 import sit.int221.oasipservice.entities.EventBooking;
 import sit.int221.oasipservice.entities.EventCategory;
 import sit.int221.oasipservice.entities.User;
-import sit.int221.oasipservice.exceptions.ForbiddenException;
 import sit.int221.oasipservice.repositories.CategoryRepository;
 import sit.int221.oasipservice.repositories.UserRepository;
 import sit.int221.oasipservice.services.CategoryService;
 import sit.int221.oasipservice.utils.JwtUtils;
 import sit.int221.oasipservice.utils.ListMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +68,8 @@ public class CategoryServiceImpl implements CategoryService {
                     .map(EventCategory::getId)
                     .toList();
             if (!list.contains(id)) {
-                throw new ForbiddenException("this lecturer does not own this category id: " + id);
+                log.info("[" + ROLE_LECTURER.getRole() + "]" + " does not own this category id: " + id);
+                return new ArrayList<>();
             }
             return listMapper.mapList(bookings, BookingViewDto.class, modelMapper);
         }
