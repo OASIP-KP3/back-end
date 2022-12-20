@@ -20,6 +20,7 @@ import sit.int221.oasipservice.utils.ListMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static sit.int221.oasipservice.entities.ERole.ROLE_LECTURER;
 import static sit.int221.oasipservice.entities.ERole.ROLE_STUDENT;
@@ -63,11 +64,8 @@ public class CategoryServiceImpl implements CategoryService {
         }
         if (jwtUtils.getRoles().contains(ROLE_LECTURER.getRole())) {
             User lecturer = userRepo.findByUserEmail(jwtUtils.getEmail());
-            List<Integer> list = lecturer.getOwnCategories()
-                    .stream()
-                    .map(EventCategory::getId)
-                    .toList();
-            if (!list.contains(id)) {
+            Set<EventCategory> categories = lecturer.getOwnCategories();
+            if (categories.stream().noneMatch(c -> c.getId().equals(id))) {
                 log.info("[" + ROLE_LECTURER.getRole() + "]" + " does not own this category id: " + id);
                 return new ArrayList<>();
             }
